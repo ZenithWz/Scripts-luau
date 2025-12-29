@@ -1,1 +1,1 @@
-# Scripts.luau
+# Scripts/luau
