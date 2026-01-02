@@ -2035,20 +2035,20 @@ Farming:AddToggle({
     end
 })
 spawn(function()
-    while wait(Sec) do
+    while task.wait(0.1) do -- checa a cada 0.1s
         if _G.AutoFarmChest then
             pcall(function()
                 local CollectionService = game:GetService("CollectionService")
                 local Players = game:GetService("Players")
                 local Player = Players.LocalPlayer
                 local Character = Player.Character or Player.CharacterAdded:Wait()
-                if not Character then
-                    return
-                end
+                if not Character then return end
+
                 local Position = Character:GetPivot().Position
                 local Chests = CollectionService:GetTagged("_ChestTagged")
                 local Distance, Nearest = math.huge, nil
-                for i = 1, # Chests do
+
+                for i = 1, #Chests do
                     local Chest = Chests[i]
                     local Magnitude = (Chest:GetPivot().Position - Position).Magnitude
                     if not SelectedIsland or Chest:IsDescendantOf(SelectedIsland) then
@@ -2058,14 +2058,14 @@ spawn(function()
                         end
                     end
                 end
+
                 if Nearest then
-                    _tp(Nearest:GetPivot())
+                    _tp(Nearest:GetPivot()) -- teleporta imediatamente
                 end
             end)
         end
     end
 end)
-
 
 Farming:AddSection("Raid")
 
@@ -2288,6 +2288,111 @@ spawn(function()
 end)
 
 
+
+local Travel = Window:MakeTab({
+    Name = "Travel",
+    Icon = "mappin"
+})
+
+Travel:AddSection("Worlds")
+
+
+-- Seção de Mares
+Travel:AddButton({
+    Name = "Teleport Sea 1",
+    Callback = function()
+        game:GetService("ReplicatedStorage").Remotes.CommF_:InvokeServer("TravelMain")
+    end
+})
+
+Travel:AddButton({
+    Name = "Teleport Sea 2",
+    Callback = function()
+        game:GetService("ReplicatedStorage").Remotes.CommF_:InvokeServer("TravelDressrosa")
+    end
+})
+
+Travel:AddButton({
+    Name = "Teleport Sea 3",
+    Callback = function()
+        game:GetService("ReplicatedStorage").Remotes.CommF_:InvokeServer("TravelZou")
+    end
+})
+
+-- Lista de Ilhas (Gera a lista automaticamente)
+local Location = {}
+for _, e in pairs(workspace._WorldOrigin.Locations:GetChildren()) do
+    table.insert(Location, e.Name)
+end
+
+Travel:AddSection("Island")
+
+-- Dropdown de Seleção de Ilha
+Travel:AddDropdown({
+    Name = "Select Island",
+    Options = Location,
+    Default = false,
+    Callback = function(I)
+        _G.Island = I
+    end,
+})
+
+-- Toggle de Teleporte com sua lógica específica
+Travel:AddToggle({
+    Name = "Teleport to Island",
+    Default = false,
+    Callback = function(Value)
+        _G.Teleport = Value
+        
+        if Value then
+            -- Definindo variáveis do jogador local
+            local plr = game.Players.LocalPlayer
+            local Character = plr.Character or plr.CharacterAdded:Wait()
+            local Root = Character:WaitForChild("HumanoidRootPart")
+            
+            -- Procurar a ilha selecionada
+            local targetIsland = workspace._WorldOrigin.Locations:FindFirstChild(_G.Island)
+            
+            if targetIsland then
+                spawn(function()
+                    -- 1. Subida Instantânea (700 studs acima de onde você está agora)
+                    Root.CFrame = Root.CFrame * CFrame.new(0, 700, 0)
+                    wait(0.1) -- Pequena pausa para o motor físico processar
+                    
+                    -- 2. Viagem (Mantendo a altura de 700 studs acima do destino)
+                    local destination = targetIsland.CFrame * CFrame.new(0, 700, 0)
+                    
+                    -- Repete o movimento até chegar perto do destino (eixo X e Z)
+                    repeat
+                        wait()
+                        -- Certifique-se que a função _tp existe no seu script
+                        if _tp then
+                            _tp(destination)
+                        else
+                            -- Fallback caso _tp não esteja definido:
+                            Root.CFrame = destination
+                        end
+                    until not _G.Teleport or (Root.Position - destination.p).Magnitude < 10
+                    
+                    -- 3. Descida Instantânea (Teleporta para a superfície da ilha)
+                    if _G.Teleport then
+                        Root.CFrame = targetIsland.CFrame * CFrame.new(0, 5, 0) -- 5 studs para não bugar no chão
+                    end
+                    
+                    -- 4. Desligar Automático
+                    _G.Teleport = false
+                    -- Se sua biblioteca suportar SetValue para desligar o botão visualmente:
+                    -- self:Set(false) 
+                end)
+            else
+                print("Selecione uma ilha primeiro!")
+                _G.Teleport = false
+            end
+        end
+    end,
+})
+
+
 -- Tab Stats
 local Stats = Window:MakeTab({
     Title = "Stats",
@@ -2403,110 +2508,6 @@ spawn(function()
         end)
     end
 end)
-
-
-local Travel = Window:MakeTab({
-    Name = "Travel",
-    Icon = "mappin"
-})
-
-Travel:AddSection("Worlds")
-
-
--- Seção de Mares
-Travel:AddButton({
-    Name = "Teleport Sea 1",
-    Callback = function()
-        game:GetService("ReplicatedStorage").Remotes.CommF_:InvokeServer("TravelMain")
-    end
-})
-
-Travel:AddButton({
-    Name = "Teleport Sea 2",
-    Callback = function()
-        game:GetService("ReplicatedStorage").Remotes.CommF_:InvokeServer("TravelDressrosa")
-    end
-})
-
-Travel:AddButton({
-    Name = "Teleport Sea 3",
-    Callback = function()
-        game:GetService("ReplicatedStorage").Remotes.CommF_:InvokeServer("TravelZou")
-    end
-})
-
--- Lista de Ilhas (Gera a lista automaticamente)
-local Location = {}
-for _, e in pairs(workspace._WorldOrigin.Locations:GetChildren()) do
-    table.insert(Location, e.Name)
-end
-
-Travel:AddSection("Island")
-
--- Dropdown de Seleção de Ilha
-Travel:AddDropdown({
-    Name = "Select Island",
-    Options = Location,
-    Default = false,
-    Callback = function(I)
-        _G.Island = I
-    end,
-})
-
--- Toggle de Teleporte com sua lógica específica
-Travel:AddToggle({
-    Name = "Teleport to Island",
-    Default = false,
-    Callback = function(Value)
-        _G.Teleport = Value
-        
-        if Value then
-            -- Definindo variáveis do jogador local
-            local plr = game.Players.LocalPlayer
-            local Character = plr.Character or plr.CharacterAdded:Wait()
-            local Root = Character:WaitForChild("HumanoidRootPart")
-            
-            -- Procurar a ilha selecionada
-            local targetIsland = workspace._WorldOrigin.Locations:FindFirstChild(_G.Island)
-            
-            if targetIsland then
-                spawn(function()
-                    -- 1. Subida Instantânea (700 studs acima de onde você está agora)
-                    Root.CFrame = Root.CFrame * CFrame.new(0, 700, 0)
-                    wait(0.1) -- Pequena pausa para o motor físico processar
-                    
-                    -- 2. Viagem (Mantendo a altura de 700 studs acima do destino)
-                    local destination = targetIsland.CFrame * CFrame.new(0, 700, 0)
-                    
-                    -- Repete o movimento até chegar perto do destino (eixo X e Z)
-                    repeat
-                        wait()
-                        -- Certifique-se que a função _tp existe no seu script
-                        if _tp then
-                            _tp(destination)
-                        else
-                            -- Fallback caso _tp não esteja definido:
-                            Root.CFrame = destination
-                        end
-                    until not _G.Teleport or (Root.Position - destination.p).Magnitude < 10
-                    
-                    -- 3. Descida Instantânea (Teleporta para a superfície da ilha)
-                    if _G.Teleport then
-                        Root.CFrame = targetIsland.CFrame * CFrame.new(0, 5, 0) -- 5 studs para não bugar no chão
-                    end
-                    
-                    -- 4. Desligar Automático
-                    _G.Teleport = false
-                    -- Se sua biblioteca suportar SetValue para desligar o botão visualmente:
-                    -- self:Set(false) 
-                end)
-            else
-                print("Selecione uma ilha primeiro!")
-                _G.Teleport = false
-            end
-        end
-    end,
-})
 
 
 
