@@ -2550,31 +2550,30 @@ local plr = game.Players.LocalPlayer
 local TweenService = game:GetService("TweenService")
 
 -- CONFIG
-local BRING_TIME = 3      -- tempo trazendo
-local RELEASE_TIME = 5    -- tempo soltando
+local BRING_TIME = 3
+local RELEASE_TIME = 5
 local RANGE_PLAYER = 200
 local RANGE_PULL = 150
+local TWEEN_SPEED = 50
 
--- Tween MUITO lento
+-- Tween suave
 local function TweenObject(Object, TargetCFrame, Speed)
-    Speed = Speed or 30
+    Speed = Speed or TWEEN_SPEED
     if not Object or not TargetCFrame then return end
-
     local Distance = (TargetCFrame.Position - Object.Position).Magnitude
     local Time = Distance / Speed
-
     local tween = TweenService:Create(
         Object,
         TweenInfo.new(Time, Enum.EasingStyle.Linear, Enum.EasingDirection.Out),
-        { CFrame = TargetCFrame }
+        {CFrame = TargetCFrame}
     )
     tween:Play()
 end
 
+-- Pega posição média dos mobs
 local function GetMobPosition(MobName)
     local pos = Vector3.zero
     local count = 0
-
     for _, v in pairs(workspace.Enemies:GetChildren()) do
         if v.Name == MobName
         and v:FindFirstChild("HumanoidRootPart")
@@ -2584,21 +2583,23 @@ local function GetMobPosition(MobName)
             count += 1
         end
     end
-
     if count == 0 then return nil end
     return pos / count
 end
 
+-- Bring principal (verifica todos os farms)
 local function BringMob()
+    -- Só puxa se algum farm estiver ativo
+    if not (_G.AutoFarm_Bone or _G.AutoFarmNear or _G.Level) then return end
+
     local char = plr.Character
     if not char or not char:FindFirstChild("HumanoidRootPart") then return end
-
     local playerHRP = char.HumanoidRootPart
+
     local enemies = workspace.Enemies:GetChildren()
     if #enemies == 0 then return end
 
     local totalpos = {}
-
     for _, v in pairs(enemies) do
         if not totalpos[v.Name] then
             totalpos[v.Name] = GetMobPosition(v.Name)
@@ -2606,21 +2607,16 @@ local function BringMob()
     end
 
     for _, v in pairs(enemies) do
-        if v:FindFirstChild("Humanoid")
-        and v:FindFirstChild("HumanoidRootPart")
-        and v.Humanoid.Health > 0 then
-
-            local hrp = v.HumanoidRootPart
+        local hum = v:FindFirstChild("Humanoid")
+        local hrp = v:FindFirstChild("HumanoidRootPart")
+        if hum and hrp and hum.Health > 0 then
             local distPlayer = (hrp.Position - playerHRP.Position).Magnitude
-
             if distPlayer <= RANGE_PLAYER then
                 local mobPos = totalpos[v.Name]
                 if mobPos then
-                    local target = CFrame.new(mobPos)
-                    local dist = (hrp.Position - target.Position).Magnitude
-
+                    local dist = (hrp.Position - mobPos).Magnitude
                     if dist > 6 and dist <= RANGE_PULL then
-                        TweenObject(hrp, target, 40)
+                        TweenObject(hrp, CFrame.new(mobPos), TWEEN_SPEED)
                         hrp.CanCollide = false
                     end
                 end
@@ -2633,17 +2629,14 @@ local function BringMob()
     end)
 end
 
--- LOOP DE CONTROLE (3s bring / 5s release)
+-- LOOP de Bring (3s trazer / 5s soltar)
 task.spawn(function()
     while task.wait() do
-        -- BRING ON
         local t0 = tick()
         while tick() - t0 < BRING_TIME do
             BringMob()
             task.wait(0.2)
         end
-
-        -- RELEASE (não força posição)
         local t1 = tick()
         while tick() - t1 < RELEASE_TIME do
             task.wait()
