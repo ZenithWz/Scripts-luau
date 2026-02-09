@@ -4990,24 +4990,28 @@ Others:AddSection({"Aura Colours"});
  
 
  Others:AddToggle({
-    Name = "Auto Buy Buso Colors",
+    Name = "Buy Buso Colors",
     Description = "",
+
     Default = GetSetting("BuyBusoColors_Save", false),
+
     Callback = function(I)
-        _G.Auto_Buy_Buso_Colors = I
-        _G.SaveData["BuyBusoColors_Save"] = I
+        _G.Buy_Buso_Colors = I
+
+        _G.SaveData["BuyBusoColors_Save"] = I  
         SaveSettings()
 
         task.spawn(function()
-            while _G.Auto_Buy_Buso_Colors do
-                pcall(function()
-                    replicated.Remotes.CommF_:InvokeServer("ColorsDealer", "2")
-                end)
-                task.wait(1) -- tempo entre as compras (pode diminuir se quiser)
+            while _G.Buy_Buso_Colors do
+                replicated.Remotes.CommF_:InvokeServer("ColorsDealer", "2")
+                task.wait(1)
             end
         end)
     end,
+
 })
+end
+
 if World3 then
  Others:AddToggle({
     Name = "Auto Rainbow Haki",
