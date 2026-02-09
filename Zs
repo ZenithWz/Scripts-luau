@@ -2382,7 +2382,7 @@ QuestNeta = function()
 			[6] = PosQ,
 		};
 	end;
-	local Library = loadstring(game:HttpGet("https://pastefy.app/XA20ygdD/raw"))():MakeWindow({
+	local Library = loadstring(game:HttpGet("https://raw.githubusercontent.com/ZenithWz/Scripts-luau/refs/heads/main/UI"))():MakeWindow({
     Title = "Darkness Hub",
     SubTitle = "By Anonymous",
     SaveFolder = "dark.json"
