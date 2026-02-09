@@ -2402,6 +2402,12 @@ local Event = Library:MakeTab({
     Icon = "rbxassetid://10747376931"
 })
 
+local Fish = Library:MakeTab({
+    Title = "Fishing",
+    Icon = "rbxassetid://127664059821666"
+})
+
+
 local Race = Library:MakeTab({
     Title = "Race Upgrade",
     Icon = "rbxassetid://10734897102"
@@ -3781,29 +3787,10 @@ end);
 end
 Setting:AddSection({"Manual Save"})
 
-Setting:AddButton({
-    Name = "Salvar Configurações Agora",
-    Description = "Cria um backup manual das tuas opções atuais",
-    Callback = function()
-        -- Verifica se a função existe antes de chamar
-        if SaveSettings then
-            SaveSettings()
-            
-            -- Notificação Universal (Funciona sem a lib Fluent)
-            game.StarterGui:SetCore("SendNotification", {
-                Title = "Abacaxi Hub",
-                Text = "Configurações salvas com sucesso!",
-                Duration = 5
-            })
-        else
-            warn("Erro: Função SaveSettings não encontrada!")
-        end
-    end
-})
 
 Setting:AddButton({
-    Name = "Resetar Configurações",
-    Description = "Apaga o ficheiro de save e volta ao padrão",
+    Name = "Reset Settings Script",
+    Description = "",
     Callback = function()
         -- Usa a variável FullPath que foi definida lá no topo do script
         if isfile and isfile(FullPath) then
@@ -3812,14 +3799,14 @@ Setting:AddButton({
             
             -- Notificação Universal
             game.StarterGui:SetCore("SendNotification", {
-                Title = "Abacaxi Hub",
-                Text = "Configurações resetadas! Re-execute o script.",
+                Title = "Darknnes Hub",
+                Text = "Done",
                 Duration = 5
             })
         else
             game.StarterGui:SetCore("SendNotification", {
-                Title = "Abacaxi Hub",
-                Text = "Nenhum arquivo de save encontrado para apagar.",
+                Title = "Darknnes Hub",
+                Text = "Nil",
                 Duration = 3
             })
         end
@@ -4138,9 +4125,10 @@ _G.AutoQuestComplete = false
 _G.AutoSellFish = false
 _G.AutoSkillZ = false
 
+Fish:AddSection({"Select"})
 
 -- 1. SELEÇÃO DE VARA
-Others:AddDropdown({
+Fish:AddDropdown({
     Name = "Select Fishing Rod",
     Description = "",
     Options = {
@@ -4162,7 +4150,7 @@ Others:AddDropdown({
 
 -- 2. SELEÇÃO DE ISCA
 
-Others:AddDropdown({
+Fish:AddDropdown({
     Name = "Select Bait",
     Description = "",
     Options = {
@@ -4190,10 +4178,12 @@ Others:AddDropdown({
     end
 })
 
+Fish:AddSection({"Fishing"})
+
 -- 3. TOGGLE AUTO BUY BAIT
-Others:AddToggle({
+Fish:AddToggle({
     Name = "Auto Buy Bait",
-    Description = "Crafta a isca selecionada automaticamente",
+    Description = "",
     -- Carrega se estava ligado
     Default = GetSetting("Fish_AutoBuyBait", false),
     Callback = function(Value)
@@ -4221,9 +4211,9 @@ task.spawn(function()
 end)
 
 -- 4. TOGGLE AUTO FISHING (CAST/CATCH)
-Others:AddToggle({
+Fish:AddToggle({
     Name = "Auto Fishing",
-    Description = "Lança e puxa a vara automaticamente",
+    Description = "",
     -- Carrega se estava ligado
     Default = GetSetting("Fish_AutoFishing", false),
     Callback = function(Value)
@@ -4295,10 +4285,12 @@ task.spawn(function()
     end
 end)
 
+Fish:AddSection({"Quests"})
+
 -- 5. AUTO QUEST FISHING
-Others:AddToggle({
+Fish:AddToggle({
     Name = "Auto Quest Fishing",
-    Description = "Pega missão com o NPC Angler",
+    Description = "",
     -- Carrega se estava ligado
     Default = GetSetting("Fish_AutoQuest", false),
     Callback = function(Value)
@@ -4333,9 +4325,9 @@ task.spawn(function()
 end)
 
 -- 6. AUTO COMPLETE QUEST
-Others:AddToggle({
+Fish:AddToggle({
     Name = "Auto Complete Quest",
-    Description = "Entrega a quest automaticamente",
+    Description = "",
     -- Carrega se estava ligado
     Default = GetSetting("Fish_AutoComplete", false),
     Callback = function(Value)
@@ -4362,10 +4354,12 @@ task.spawn(function()
     end
 end)
 
+Fish:AddSection({"Misc Fish"})
+
 -- 7. AUTO SELL FISH
-Others:AddToggle({
+Fish:AddToggle({
     Name = "Auto Sell Fish",
-    Description = "Vende peixes automaticamente",
+    Description = "",
     -- Carrega se estava ligado
     Default = GetSetting("Fish_AutoSell", false),
     Callback = function(Value)
@@ -4393,9 +4387,9 @@ task.spawn(function()
 end)
 
 -- 8. AUTO SPAM SKILL Z
-Others:AddToggle({
+Fish:AddToggle({
     Name = "Auto use skill of the rod",
-    Description = "Spamma a skill Z da ferramenta equipada",
+    Description = "",
     -- Carrega se estava ligado
     Default = GetSetting("Fish_AutoSkillZ", false),
     Callback = function(Value)
@@ -4659,7 +4653,7 @@ spawn(function()
         end
     end
 end)
-Others:AddSection({"Quests"})
+Others:AddSection({"Quests Haki Observation"})
  Others:AddToggle({
     Name = "Auto Farm Haki Observation",
     Description = "",
