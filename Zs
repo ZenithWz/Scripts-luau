@@ -4661,7 +4661,7 @@ spawn(function()
 end)
 Others:AddSection({"Quests"})
  Others:AddToggle({
-    Name = "Auto Farm Observation",
+    Name = "Auto Farm Haki Observation",
     Description = "",
     -- 1. Carrega o estado salvo ou false por padrão
     Default = GetSetting("AutoObsFarm_Save", false),
@@ -4749,7 +4749,7 @@ spawn(function()
 end);
 if World3 then
 Others:AddToggle({
-	Name = "Auto Observation V2",
+	Name = "Auto Haki Observation V2",
 	Description = "",
 	-- 1. Carrega se estava ligado ou desligado ao abrir o script
 	Default = GetSetting("AutoKenV2_Save", false),
@@ -4911,15 +4911,8 @@ spawn(function()
 		end);
 	end;
 end);
-Others:AddSection({"Cursed Swords"});
-local r = Others:AddParagraph({ Title = "Elites Process ", Content = "" });
-spawn(function()
-	while wait(Sec) do
-		pcall(function()
-			r:SetDesc("Elite Procress :  " .. replicated.Remotes.CommF_:InvokeServer("EliteHunter", "Progress"));
-		end);
-	end;
-end);
+Others:AddSection({"Elite Farming"});
+
 Others:AddToggle({
 	Name = "Auto Elite Quest",
 	Description = "",
@@ -4963,7 +4956,7 @@ spawn(function()
 	end;
 end);
  Others:AddToggle({
-    Name = "Stop when got God's Chalice",
+    Name = "Stop when got God Chalice",
     Description = "",
     -- 1. Carrega o estado salvo ou inicia como true (padrão do seu script)
     Default = GetSetting("StopChalice_Save", true),
@@ -4988,149 +4981,33 @@ spawn(function()
 		end;
 	end;
 end);
-Others:AddToggle({
-	Name = "Auto Tushita Sword",
-	Description = "",
-	Default = false,
-	Callback = function(I)
-		_G.Auto_Tushita = I;
-	end,
-});
-spawn(function()
-	while wait(Sec) do
-		pcall(function()
-			if _G.Auto_Tushita then
-				if workspace.Map.Turtle:FindFirstChild("TushitaGate") then
-					if not GetBP("Holy Torch") then
-						_tp(CFrame.new(5148.03613, 162.352493, 910.548218));
-						wait(.7);
-					else
-						EquipWeapon("Holy Torch");
-						task.wait(1);
-						repeat
-							task.wait();
-							_tp(CFrame.new(-10752, 417, -9366));
-						until not _G.Auto_Tushita or ((CFrame.new(-10752, 417, -9366)).Position - plr.Character.HumanoidRootPart.Position).Magnitude <= 10;
-						wait(.7);
-						repeat
-							task.wait();
-							_tp(CFrame.new(-11672, 334, -9474));
-						until not _G.Auto_Tushita or ((CFrame.new(-11672, 334, -9474)).Position - plr.Character.HumanoidRootPart.Position).Magnitude <= 10;
-						wait(.7);
-						repeat
-							task.wait();
-							_tp(CFrame.new(-12132, 521, -10655));
-						until not _G.Auto_Tushita or ((CFrame.new(-12132, 521, -10655)).Position - plr.Character.HumanoidRootPart.Position).Magnitude <= 10;
-						wait(.7);
-						repeat
-							task.wait();
-							_tp(CFrame.new(-13336, 486, -6985));
-						until not _G.Auto_Tushita or ((CFrame.new(-13336, 486, -6985)).Position - plr.Character.HumanoidRootPart.Position).Magnitude <= 10;
-						wait(.7);
-						repeat
-							task.wait();
-							_tp(CFrame.new(-13489, 332, -7925));
-						until not _G.Auto_Tushita or ((CFrame.new(-13489, 332, -7925)).Position - plr.Character.HumanoidRootPart.Position).Magnitude <= 10;
-					end;
-				else
-					local I = GetConnectionEnemies("Longma");
-					if I then
-						repeat
-							task.wait();
-							G.Kill(I, _G.Auto_Tushita);
-						until I.Humanoid.Health <= 0 or not _G.Auto_Tushita or not I.Parent;
-					else
-						if replicated:FindFirstChild("Longma") then
-							_tp((replicated:FindFirstChild("Longma")).HumanoidRootPart.CFrame * CFrame.new(0, 40, 0));
-						end;
-					end;
-				end;
-			end;
-		end);
-	end;
-end);
--- AUTO YAMA (EXATAMENTE COMO VOCÊ ENVIou)
- Others:AddToggle({
-    Name = "Auto Yama Sword",
-    Description = "",
-    -- 1. Carrega o estado salvo ou false por padrão
-    Default = GetSetting("AutoYama_Save", false),
-    Callback = function(I)
-        _G.Auto_Yama = I
-        
-        -- 2. Guarda na tabela de salvamento
-        _G.SaveData["AutoYama_Save"] = I
-        
-        -- 3. Salva no arquivo Settings.json
-        SaveSettings()
-    end,
-})
-spawn(function()
-    while wait(Sec) do
-        pcall(function()
-            if _G.Auto_Yama then
-                if replicated.Remotes.CommF_:InvokeServer("EliteHunter", "Progress") < 30 then
-                    _G.FarmEliteHunt = true;
-                elseif replicated.Remotes.CommF_:InvokeServer("EliteHunter", "Progress") > 30 then
-                    _G.FarmEliteHunt = false;
-                    if (workspace.Map.Waterfall.SealedKatana.Handle.Position - plr.Character.HumanoidRootPart.Position).Magnitude >= 20 then
-                        _tp(workspace.Map.Waterfall.SealedKatana.Handle.CFrame);
-                        local I = GetConnectionEnemies("Ghost");
-                        if I then
-                            repeat
-                                wait();
-                                G.Kill(I, _G.Auto_Yama);
-                            until I.Humanoid.Health <= 0 or not I.Parent or not _G.Auto_Yama;
-                            fireclickdetector(workspace.Map.Waterfall.SealedKatana.Handle.ClickDetector);
-                        end;
-                    end;
-                end;
-            end;
-        end);
-    end;
-end);
+
 end
 if World2 or World3 then
 -- SECTION BUSO/AURA COLOURS
-Others:AddSection({"Buso/Aura Colours"});
+Others:AddSection({"Aura Colours"});
+
+ 
 
  Others:AddToggle({
-    Name = "Teleport Barista Haki",
+    Name = "Auto Buy Buso Colors",
     Description = "",
-    -- 1. Carrega se estava ligado ou desligado ao abrir o script
-    Default = GetSetting("TpBarista_Save", false),
+    Default = GetSetting("BuyBusoColors_Save", false),
     Callback = function(I)
-        _G.Tp_MasterA = I
-        
-        -- 2. Guarda na tabela de salvamento
-        _G.SaveData["TpBarista_Save"] = I
-        
-        -- 3. Salva no arquivo Settings.json
+        _G.Auto_Buy_Buso_Colors = I
+        _G.SaveData["BuyBusoColors_Save"] = I
         SaveSettings()
+
+        task.spawn(function()
+            while _G.Auto_Buy_Buso_Colors do
+                pcall(function()
+                    replicated.Remotes.CommF_:InvokeServer("ColorsDealer", "2")
+                end)
+                task.wait(1) -- tempo entre as compras (pode diminuir se quiser)
+            end
+        end)
     end,
 })
-spawn(function()
-    while wait() do
-        if _G.Tp_MasterA then
-            pcall(function()
-                for _, e in pairs(replicated.NPCs:GetChildren()) do
-                    if e.Name == "Barista Cousin" then
-                        _tp(e.HumanoidRootPart.CFrame);
-                    end;
-                end;
-            end);
-        end;
-    end;
-end);
-
- Others:AddButton({
-    Name = "Buy Buso Colors",
-    Description = "",
-    Callback = function()
-        replicated.Remotes.CommF_:InvokeServer("ColorsDealer", "2");
-    end
-});
-end
 if World3 then
  Others:AddToggle({
     Name = "Auto Rainbow Haki",
@@ -5250,7 +5127,7 @@ end
     end,
 })
 
-Event:AddSection({"Sea Event / Setting Sail"})
+Event:AddSection({"Sea Event"})
 local z5 = {
         "Guardian",
         "PirateGrandBrigade",
@@ -7547,7 +7424,7 @@ function IslandESP_Func()
 end
 
 -- UI E TOGGLES
-Esp:AddSection({"Esp Items / Entity / Island"});
+Esp:AddSection({"Esp Section"});
 
 Esp:AddToggle({Name = "Esp Berries", Default = false, Callback = function(I) 
     BerryEsp = I; 
@@ -7604,147 +7481,7 @@ if World3 then
 end
 
 
-Esp:AddSection({"Fontes"});
 
-local currentFont = Enum.Font.Arial -- Fonte padrão inicial
-
-local function ApplyGlobalFont(fontEnum)
-    currentFont = fontEnum
-
-    -- Aplica a fonte para todos os objetos existentes
-    for _, obj in ipairs(game.Players.LocalPlayer.PlayerGui:GetDescendants()) do
-        if obj:IsA("TextLabel") or obj:IsA("TextButton") or obj:IsA("TextBox") then
-            obj.Font = fontEnum
-        end
-    end
-end
-
--- Observa novos objetos adicionados futuramente
-game.Players.LocalPlayer.PlayerGui.DescendantAdded:Connect(function(obj)
-    if obj:IsA("TextLabel") or obj:IsA("TextButton") or obj:IsA("TextBox") then
-        obj.Font = currentFont
-    end
-end)
-
-Esp:AddButton({
-    Name = "Fonte: Amatic SC",
-    Description = "",
-    Callback = function()
-        ApplyGlobalFont(Enum.Font.AmaticSC)
-    end
-})
-
-Esp:AddButton({
-    Name = "Fonte: Antique",
-    Description = "",
-    Callback = function()
-        ApplyGlobalFont(Enum.Font.Antique)
-    end
-})
-
-Esp:AddButton({
-    Name = "Fonte: Arcade",
-    Description = "",
-    Callback = function()
-        ApplyGlobalFont(Enum.Font.Arcade)
-    end
-})
-
-Esp:AddButton({
-    Name = "Fonte: Arial",
-    Description = "",
-    Callback = function()
-        ApplyGlobalFont(Enum.Font.Arial)
-    end
-})
-
-Esp:AddButton({
-    Name = "Fonte: Arial Bold",
-    Description = "",
-    Callback = function()
-        ApplyGlobalFont(Enum.Font.ArialBold)
-    end
-})
-
-Esp:AddButton({
-    Name = "Fonte: Bangers",
-    Description = "",
-    Callback = function()
-        ApplyGlobalFont(Enum.Font.Bangers)
-    end
-})
-
-Esp:AddButton({
-    Name = "Fonte: Bodoni",
-    Description = "",
-    Callback = function()
-        ApplyGlobalFont(Enum.Font.Bodoni)
-    end
-})
-
-Esp:AddButton({
-    Name = "Fonte: Cartoon",
-    Description = "",
-    Callback = function()
-        ApplyGlobalFont(Enum.Font.Cartoon)
-    end
-})
-
-Esp:AddButton({
-    Name = "Fonte: Code",
-    Description = "",
-    Callback = function()
-        ApplyGlobalFont(Enum.Font.Code)
-    end
-})
-
-Esp:AddButton({
-    Name = "Fonte: Creepster",
-    Description = "",
-    Callback = function()
-        ApplyGlobalFont(Enum.Font.Creepster)
-    end
-})
-
-Esp:AddButton({
-    Name = "Fonte: Denk One",
-    Description = "",
-    Callback = function()
-        ApplyGlobalFont(Enum.Font.DenkOne)
-    end
-})
-
-Esp:AddButton({
-    Name = "Fonte: Fondamento",
-    Description = "",
-    Callback = function()
-        ApplyGlobalFont(Enum.Font.Fondamento)
-    end
-})
-
-Esp:AddButton({
-    Name = "Fonte: Fredoka One",
-    Description = "",
-    Callback = function()
-        ApplyGlobalFont(Enum.Font.FredokaOne)
-    end
-})
-
-Esp:AddButton({
-    Name = "Fonte: Garamond",
-    Description = "",
-    Callback = function()
-        ApplyGlobalFont(Enum.Font.Garamond)
-    end
-})
-
-Esp:AddButton({
-    Name = "Fonte: Gotham",
-    Description = "",
-    Callback = function()
-        ApplyGlobalFont(Enum.Font.Gotham)
-    end
-})
 Esp:AddSection({"Stats"});
 
 -- // AUTO STATS (Adicionado à aba VI_S conforme solicitado) // --
@@ -8909,425 +8646,9 @@ spawn(function()
 		end
 	end
 end)
-if World3 then
-Get:AddSection({"Cursed Dual Katana"});
-local I5 = Get:AddParagraph({ Title = " Number Cursed dual katana quests ", Content = "Quest Numbers :" });
-spawn(function()
-	while wait(.2) do
-		if QuestYama_1 == true then
-			I5:SetDesc(" Quest Numbers : yama quest 1");
-		elseif QuestYama_2 == true then
-			I5:SetDesc(" Quest Numbers : yama quest 2");
-		elseif QuestYama_3 == true then
-			I5:SetDesc(" Quest Numbers : yama quest 3");
-		elseif QuestTushita_1 == true then
-			I5:SetDesc(" Quest Numbers : tushita quest 1");
-		elseif QuestTushita_2 == true then
-			I5:SetDesc(" Quest Numbers : tushita quest 2");
-		elseif QuestTushita_1 == true then
-			I5:SetDesc(" Quest Numbers: tushita quest 2");
-		elseif GetWP("Cursed Dual Katana") then
-			I5:SetDesc(" Quest Numbers: CDK done!!");
-		end;
-	end;
-end);
-Get:AddToggle({
- Name = "Auto Get CDK [ Last Quest ]",
-    Description = "",
-    -- 1. Carrega o estado salvo ou false por padrão
-    Default = GetSetting("AutoCDK_Save", false),
-    Callback = function(I)
-        _G.CDK = I
-        
-        -- 2. Guarda na tabela de salvamento
-        _G.SaveData["AutoCDK_Save"] = I
-        
-        -- 3. Salva no arquivo Settings.json
-        SaveSettings()
-    end,
-})
-spawn(function()
-	while wait(Sec) do
-		pcall(function()
-			if _G.CDK then
-				replicated.Remotes.CommF_:InvokeServer("CDKQuest", "Progress", "Good");
-				replicated.Remotes.CommF_:InvokeServer("CDKQuest", "Progress", "Evil");
-				replicated.Remotes.CommF_:InvokeServer("CDKQuest", "StartTrial", "Boss");
-				local I = GetConnectionEnemies("Cursed Skeleton Boss");
-				if I then
-					repeat
-						wait();
-						if plr.Character:FindFirstChild("Yama") or plr.Backpack:FindFirstChild("Yama") then
-							EquipWeapon("Yama");
-						elseif plr.Character:FindFirstChild("Tushita") or plr.Backpack:FindFirstChild("Tushita") then
-							EquipWeapon("Tushita");
-						end;
-						_tp(I.HumanoidRootPart.CFrame * CFrame.new(0, 20, 0));
-					until not _G.CDK or not I.Parent or I.Humanoid.Health <= 0;
-				else
-					_tp(CFrame.new(-12318.193359375, 601.95184326172, -6538.662109375));
-					wait(.5);
-					_tp(workspace.Map.Turtle.Cursed.BossDoor.CFrame);
-				end;
-			end;
-		end);
-	end;
-end);
-Get:AddToggle({
- Name = "Auto Yama CDK",
-    Description = "",
-    -- 1. Carrega o estado salvo ou false por padrão
-    Default = GetSetting("AutoYamaCDK_Save", false),
-    Callback = function(I)
-        _G.CDK_YM = I
-        
-        -- 2. Guarda na tabela de salvamento
-        _G.SaveData["AutoYamaCDK_Save"] = I
-        
-        -- 3. Salva no arquivo Settings.json
-        SaveSettings()
-    end,
-})
 
-spawn(function()
-	while wait() do
-		pcall(function()
-			if _G.CDK_YM then
-				if tostring(replicated.Remotes.CommF_:InvokeServer("CDKQuest", "OpenDoor")) ~= "opened" then
-					replicated.Remotes.CommF_:InvokeServer("CDKQuest", "OpenDoor");
-					replicated.Remotes.CommF_:InvokeServer("CDKQuest", "OpenDoor", true);
-				else
-					if (replicated.Remotes.CommF_:InvokeServer("CDKQuest", "Progress")).Finished == nil then
-						replicated.Remotes.CommF_:InvokeServer("CDKQuest", "StartTrial", "Evil");
-						replicated.Remotes.CommF_:InvokeServer("CDKQuest", "StartTrial", "Evil");
-					elseif (replicated.Remotes.CommF_:InvokeServer("CDKQuest", "Progress")).Finished == false then
-						if tonumber((replicated.Remotes.CommF_:InvokeServer("CDKQuest", "Progress")).Evil) == -3 then
-							QuestYama_1 = true;
-							QuestYama_2 = false;
-							QuestYama_3 = false;
-							repeat
-								task.wait();
-								if not workspace.Enemies:FindFirstChild("Forest Pirate") then
-									_tp(CFrame.new(-13223.521484375, 428.19381713867, -7766.0678710938));
-								else
-									local I = GetConnectionEnemies("Forest Pirate");
-									if I then
-										_tp((workspace.Enemies:FindFirstChild("Forest Pirate")).HumanoidRootPart.CFrame);
-									end;
-								end;
-							until tonumber((replicated.Remotes.CommF_:InvokeServer("CDKQuest", "Progress")).Evil) == 1 or not _G.CDK_YM;
-						elseif tonumber((replicated.Remotes.CommF_:InvokeServer("CDKQuest", "Progress")).Evil) == -4 then
-							QuestYama_1 = false;
-							QuestYama_2 = true;
-							QuestYama_3 = false;
-							for I, e in pairs((game:GetService("Players")).LocalPlayer.QuestHaze:GetChildren()) do
-								for I, K in pairs(w) do
-									if string.find(I, e.Name) and e.Value > 0 then
-										if (K.Position - Root.Position).Magnitude <= 1000 and workspace.Enemies:FindFirstChild(I) then
-											for I, e in pairs(workspace.Enemies:GetChildren()) do
-												if e:FindFirstChild("HumanoidRootPart") and (e:FindFirstChild("Humanoid") and ((e:FindFirstChild("Humanoid")).Health > 0 and e:FindFirstChild("HazeESP"))) then
-													repeat
-														wait();
-														G.Kill(e, _G.CDK_YM);
-													until not _G.CDK_YM or tonumber((replicated.Remotes.CommF_:InvokeServer("CDKQuest", "Progress")).Evil) == 2 or not e:FindFirstChild("HazeESP") or e.Humanoid.Health <= 0;
-												end;
-											end;
-										else
-											_tp(K);
-										end;
-									end;
-								end;
-							end;
-						elseif tonumber((replicated.Remotes.CommF_:InvokeServer("CDKQuest", "Progress")).Evil) == -5 then
-							QuestYama_1 = false;
-							QuestYama_2 = false;
-							QuestYama_3 = true;
-							if workspace.Map:FindFirstChild("HellDimension") then
-								if (Root.Position - workspace.Map.HellDimension.Spawn.Position).Magnitude <= 1000 then
-									for I, e in pairs(workspace.Map.HellDimension.Exit:GetChildren()) do
-										if tonumber(I) == 2 then
-											repeat
-												task.wait();
-												Root.CFrame = workspace.Map.HellDimension.Exit.CFrame;
-											until not _G.CDK_YM or tonumber((replicated.Remotes.CommF_:InvokeServer("CDKQuest", "Progress")).Evil) == 3;
-										end;
-									end;
-									EquipWeapon(_G.SelectWeapon);
-									if tonumber((replicated.Remotes.CommF_:InvokeServer("CDKQuest", "Progress")).Evil) ~= 3 then
-										repeat
-											task.wait();
-											repeat
-												task.wait();
-												_tp(workspace.Map.HellDimension.Torch1.Particles.CFrame);
-												for I, e in pairs(workspace.Map.HellDimension:GetDescendants()) do
-													if e:IsA("ProximityPrompt") then
-														fireproximityprompt(e);
-													end;
-												end;
-											until (workspace.Map.HellDimension.Torch1.Particles.Position - Root.Position).Magnitude < 5;
-											wait(2);
-											_G.T1Yama = true;
-										until not _G.CDK_YM or _G.T1Yama or tonumber((replicated.Remotes.CommF_:InvokeServer("CDKQuest", "Progress")).Evil) == 3;
-										repeat
-											task.wait();
-											repeat
-												task.wait();
-												_tp(workspace.Map.HellDimension.Torch2.Particles.CFrame);
-												for I, e in pairs(workspace.Map.HellDimension:GetDescendants()) do
-													if e:IsA("ProximityPrompt") then
-														fireproximityprompt(e);
-													end;
-												end;
-											until (workspace.Map.HellDimension.Torch2.Particles.Position - Root.Position).Magnitude < 5;
-											wait(2);
-											_G.T2Yama = true;
-										until _G.T2Yama or _G.CDK_YM == false or tonumber((replicated.Remotes.CommF_:InvokeServer("CDKQuest", "Progress")).Evil) == 3;
-										repeat
-											wait();
-											repeat
-												task.wait();
-												_tp(workspace.Map.HellDimension.Torch3.Particles.CFrame);
-												for I, e in pairs(workspace.Map.HellDimension:GetDescendants()) do
-													if e:IsA("ProximityPrompt") then
-														fireproximityprompt(e);
-													end;
-												end;
-											until (workspace.Map.HellDimension.Torch3.Particles.Position - Root.Position).Magnitude < 5;
-											wait(2);
-											_G.T3Yama = true;
-										until _G.T3Yama or _G.CDK_YM == false or tonumber((replicated.Remotes.CommF_:InvokeServer("CDKQuest", "Progress")).Evil) == 3;
-									end;
-									for I, e in pairs(workspace.Enemies:GetChildren()) do
-										if ((e:FindFirstChild("HumanoidRootPart")).Position - workspace.Map.HellDimension.Spawn.Position).Magnitude <= 300 then
-											if e:FindFirstChild("HumanoidRootPart") and (e:FindFirstChild("Humanoid") and (e:FindFirstChild("Humanoid")).Health > 0) then
-												repeat
-													task.wait();
-													G.Kill(e, _G.CDK_YM);
-												until not _G.CDK_YM or e.Humanoid.Health <= 0 or not e.Parent or tonumber((replicated.Remotes.CommF_:InvokeServer("CDKQuest", "Progress")).Evil) == 3;
-											end;
-										end;
-									end;
-								end;
-							end;
-						end;
-					end;
-				end;
-			end;
-		end);
-	end;
-end);
-spawn(function()
-	while wait() do
-		pcall(function()
-			if _G.CDK_YM then
-				if tonumber((replicated.Remotes.CommF_:InvokeServer("CDKQuest", "Progress")).Evil) == -5 then
-					if not workspace.Map:FindFirstChild("HellDimension") or (Root.Position - workspace.Map.HellDimension.Spawn.Position).Magnitude > 1000 then
-						local I = GetConnectionEnemies("Soul Reaper");
-						if I then
-							repeat
-								task.wait();
-								_tp(I.HumanoidRootPart.CFrame);
-							until I.Humanoid.Health <= 0 or not _G.CDK_YM or not I.Parent or tonumber((replicated.Remotes.CommF_:InvokeServer("CDKQuest", "Progress")).Evil) == 3 or workspace.Map:FindFirstChild("HellDimension") and (Root.Position - workspace.Map.HellDimension.Spawn.Position).Magnitude <= 1000;
-						elseif plr.Backpack:FindFirstChild("Hallow Essence") or plr.Character:FindFirstChild("Hallow Essence") then
-							repeat
-								_tp(CFrame.new(-8932.322265625, 146.83154296875, 6062.55078125));
-								task.wait();
-							until ((CFrame.new(-8932.322265625, 146.83154296875, 6062.55078125)).Position - Root.Position).Magnitude <= 8;
-							EquipWeapon("Hallow Essence");
-						elseif replicated:FindFirstChild("Soul Reaper") and (replicated:FindFirstChild("Soul Reaper")).Humanoid.Health > 0 then
-							_tp((replicated:FindFirstChild("Soul Reaper")).HumanoidRootPart.CFrame);
-						else
-							if replicated.Remotes.CommF_:InvokeServer("Bones", "Check") < 50 and (not workspace.Enemies:FindFirstChild("Soul Reaper") and (not replicated:FindFirstChild("Soul Reaper") and not workspace.Map:FindFirstChild("HellDimension"))) then
-								if workspace.Enemies:FindFirstChild("Reborn Skeleton") or workspace.Enemies:FindFirstChild("Living Zombie") or workspace.Enemies:FindFirstChild("Domenic Soul") or workspace.Enemies:FindFirstChild("Posessed Mummy") then
-									for I, e in pairs(workspace.Enemies:GetChildren()) do
-										if e.Name == "Reborn Skeleton" or e.Name == "Living Zombie" or e.Name == "Demonic Soul" or e.Name == "Posessed Mummy" then
-											if e:FindFirstChild("HumanoidRootPart") and (e:FindFirstChild("Humanoid") and (e:FindFirstChild("Humanoid")).Health > 0) then
-												repeat
-													task.wait();
-													G.Kill(e, _G.CDK_YM);
-												until not _G.CDK_YM or e.Humanoid.Health <= 0 or not e.Parent;
-											end;
-										end;
-									end;
-								else
-									_tp(CFrame.new(-9515.2255859375, 164.00622558594, 5785.3833007812));
-								end;
-							else
-								replicated.Remotes.CommF_:InvokeServer("Bones", "Buy", 1, 1);
-							end;
-						end;
-					end;
-				end;
-			end;
-		end);
-	end;
-end);
-Get:AddToggle({
- Name = "Auto Tushita CDK",
-    Description = "",
-    -- 1. Carrega o estado salvo ou false por padrão
-    Default = GetSetting("AutoTushitaCDK_Save", false),
-    Callback = function(I)
-        _G.CDK_TS = I
-        
-        -- 2. Guarda na tabela de salvamento
-        _G.SaveData["AutoTushitaCDK_Save"] = I
-        
-        -- 3. Salva no arquivo Settings.json
-        SaveSettings()
-    end,
-})
-spawn(function()
-	while wait() do
-		pcall(function()
-			if _G.CDK_TS then
-				if tostring(replicated.Remotes.CommF_:InvokeServer("CDKQuest", "OpenDoor")) ~= "opened" then
-					wait(.7);
-					replicated.Remotes.CommF_:InvokeServer("CDKQuest", "OpenDoor");
-					wait(.3);
-					replicated.Remotes.CommF_:InvokeServer("CDKQuest", "OpenDoor", true);
-				else
-					if (replicated.Remotes.CommF_:InvokeServer("CDKQuest", "Progress")).Finished == nil then
-						replicated.Remotes.CommF_:InvokeServer("CDKQuest", "StartTrial", "Good");
-					elseif (replicated.Remotes.CommF_:InvokeServer("CDKQuest", "Progress")).Finished == false then
-						if tonumber((replicated.Remotes.CommF_:InvokeServer("CDKQuest", "Progress")).Good) == -3 then
-							QuestTushita_1 = true;
-							QuestTushita_2 = false;
-							QuestTushita_3 = false;
-							repeat
-								wait();
-								_tp(CFrame.new(-4602.5107421875, 16.446542739868, -2880.998046875));
-							until ((CFrame.new(-4602.5107421875, 16.446542739868, -2880.998046875)).Position - (game:GetService("Players")).LocalPlayer.Character.HumanoidRootPart.Position).Magnitude <= 3 or not _G.CDK_TS or tonumber((replicated.Remotes.CommF_:InvokeServer("CDKQuest", "Progress")).Good) == 1;
-							if ((CFrame.new(-4602.5107421875, 16.446542739868, -2880.998046875)).Position - (game:GetService("Players")).LocalPlayer.Character.HumanoidRootPart.Position).Magnitude <= 10 then
-								wait(.7);
-								replicated.Remotes.CommF_:InvokeServer("CDKQuest", "BoatQuest", workspace.NPCs:FindFirstChild("Luxury Boat Dealer"), "Check");
-								wait(.5);
-								replicated.Remotes.CommF_:InvokeServer("CDKQuest", "BoatQuest", workspace.NPCs:FindFirstChild("Luxury Boat Dealer"));
-							end;
-							wait(1);
-							repeat
-								wait();
-								_tp(CFrame.new(4001.1853027344, 10.089399337769, -2654.86328125));
-							until ((CFrame.new(4001.1853027344, 10.089399337769, -2654.86328125)).Position - (game:GetService("Players")).LocalPlayer.Character.HumanoidRootPart.Position).Magnitude <= 3 or not _G.CDK_TS or tonumber((replicated.Remotes.CommF_:InvokeServer("CDKQuest", "Progress")).Good) == 1;
-							if ((CFrame.new(4001.1853027344, 10.089399337769, -2654.86328125)).Position - (game:GetService("Players")).LocalPlayer.Character.HumanoidRootPart.Position).Magnitude <= 10 then
-								wait(.7);
-								replicated.Remotes.CommF_:InvokeServer("CDKQuest", "BoatQuest", workspace.NPCs:FindFirstChild("Luxury Boat Dealer"), "Check");
-								wait(.5);
-								replicated.Remotes.CommF_:InvokeServer("CDKQuest", "BoatQuest", workspace.NPCs:FindFirstChild("Luxury Boat Dealer"));
-							end;
-							wait(1);
-							repeat
-								wait();
-								_tp(CFrame.new(-9530.763671875, 7.2452087402344, -8375.5087890625));
-							until ((CFrame.new(-9530.763671875, 7.2452087402344, -8375.5087890625)).Position - (game:GetService("Players")).LocalPlayer.Character.HumanoidRootPart.Position).Magnitude <= 3 or not _G.CDK_TS or tonumber((replicated.Remotes.CommF_:InvokeServer("CDKQuest", "Progress")).Good) == 1;
-							if ((CFrame.new(-9530.763671875, 7.2452087402344, -8375.5087890625)).Position - (game:GetService("Players")).LocalPlayer.Character.HumanoidRootPart.Position).Magnitude <= 10 then
-								wait(.7);
-								replicated.Remotes.CommF_:InvokeServer("CDKQuest", "BoatQuest", workspace.NPCs:FindFirstChild("Luxury Boat Dealer"), "Check");
-								wait(.5);
-								replicated.Remotes.CommF_:InvokeServer("CDKQuest", "BoatQuest", workspace.NPCs:FindFirstChild("Luxury Boat Dealer"));
-							end;
-							wait(1);
-						elseif tonumber((replicated.Remotes.CommF_:InvokeServer("CDKQuest", "Progress")).Good) == -4 then
-							QuestTushita_1 = false;
-							QuestTushita_2 = true;
-							QuestTushita_3 = false;
-							repeat
-								wait();
-								_G.AutoRaidCastle = true;
-							until not _G.CDK_TS or tonumber((replicated.Remotes.CommF_:InvokeServer("CDKQuest", "Progress")).Good) == 2;
-							_G.AutoRaidCastle = false;
-						elseif tonumber((replicated.Remotes.CommF_:InvokeServer("CDKQuest", "Progress")).Good) == -5 then
-							QuestTushita_1 = false;
-							QuestTushita_2 = false;
-							QuestTushita_3 = true;
-							if workspace.Enemies:FindFirstChild("Cake Queen") then
-								for I, e in pairs(workspace.Enemies:GetChildren()) do
-									if e.Name == "Cake Queen" then
-										if e:FindFirstChild("Humanoid") and (e:FindFirstChild("HumanoidRootPart") and e.Humanoid.Health > 0) then
-											repeat
-												wait();
-												G.Kill(e, _G.CDK_TS);
-											until not _G.CDK_TS or not e.Parent or e.Humanoid.Health <= 0 or tonumber((replicated.Remotes.CommF_:InvokeServer("CDKQuest", "Progress")).Good) == 3;
-										end;
-									end;
-								end;
-							elseif replicated:FindFirstChild("Cake Queen") and (replicated:FindFirstChild("Cake Queen")).Humanoid.Health > 0 then
-								_tp((replicated:FindFirstChild("Cake Queen")).HumanoidRootPart.CFrame * CFrame.new(0, 30, 0));
-							else
-								if (game.Players.LocalPlayer.Character.HumanoidRootPart.Position - workspace.Map.HeavenlyDimension.Spawn.Position).Magnitude <= 1000 then
-									for I, e in pairs(workspace.Map.HeavenlyDimension.Exit:GetChildren()) do
-										Ex = I;
-									end;
-									if Ex == 2 then
-										repeat
-											wait();
-											game.Players.LocalPlayer.Character.HumanoidRootPart.CFrame = workspace.Map.HeavenlyDimension.Exit.CFrame;
-										until not _G.CDK_TS or tonumber((replicated.Remotes.CommF_:InvokeServer("CDKQuest", "Progress")).Good) == 3;
-									end;
-									repeat
-										wait();
-										repeat
-											wait();
-											_tp(CFrame.new(-22529.6171875, 5275.7739257812, 3873.5712890625));
-											for I, e in pairs(workspace.Map.HeavenlyDimension:GetDescendants()) do
-												if e:IsA("ProximityPrompt") then
-													fireproximityprompt(e);
-												end;
-											end;
-										until ((CFrame.new(-22529.6171875, 5275.7739257812, 3873.5712890625)).Position - game.Players.LocalPlayer.Character.HumanoidRootPart.Position).Magnitude < 5;
-										wait(2);
-										_G.DoneT1 = true;
-									until not _G.CDK_TS or _G.DoneT1;
-									repeat
-										wait();
-										repeat
-											wait();
-											_tp(CFrame.new(-22637.291015625, 5281.365234375, 3749.2885742188));
-											for I, e in pairs(workspace.Map.HeavenlyDimension:GetDescendants()) do
-												if e:IsA("ProximityPrompt") then
-													fireproximityprompt(e);
-												end;
-											end;
-										until ((CFrame.new(-22637.291015625, 5281.365234375, 3749.2885742188)).Position - game.Players.LocalPlayer.Character.HumanoidRootPart.Position).Magnitude < 5;
-										wait(2);
-										_G.DoneT2 = true;
-									until _G.DoneT2 or _G.CDK_TS == false;
-									repeat
-										wait();
-										repeat
-											task.wait();
-											_tp(CFrame.new(-22791.14453125, 5277.1655273438, 3764.5700683594));
-											for I, e in pairs(workspace.Map.HeavenlyDimension:GetDescendants()) do
-												if e:IsA("ProximityPrompt") then
-													fireproximityprompt(e);
-												end;
-											end;
-										until ((CFrame.new(-22791.14453125, 5277.1655273438, 3764.5700683594)).Position - game.Players.LocalPlayer.Character.HumanoidRootPart.Position).Magnitude < 5;
-										wait(2);
-										_G.DoneT3 = true;
-									until _G.DoneT3 or _G.CDK_TS == false;
-									for I, e in pairs(workspace.Enemies:GetChildren()) do
-										if ((e:FindFirstChild("HumanoidRootPart")).Position - (CFrame.new(-22695.7012, 5270.93652, 3814.42847, .11794927, 3.32185834e-08, .99301964, -8.73070718e-08, 1, -2.30819008e-08, -0.99301964, -8.3975138e-08, .11794927)).Position).Magnitude <= 300 then
-											if e:FindFirstChild("HumanoidRootPart") and (e:FindFirstChild("Humanoid") and (e:FindFirstChild("Humanoid")).Health > 0) then
-												repeat
-													wait();
-													G.Kill(e, _G.CDK_TS);
-												until not _G.CDK_TS or e.Humanoid.Health <= 0 or not e.Parent;
-											end;
-										end;
-									end;
-								end;
-							end;
-						end;
-					end;
-				end;
-			end;
-		end);
-	end;
-end);
-end
 if World2 then
-Get:AddSection({"True Triple Katana Sword"});
+Get:AddSection({"Legendy Swords"});
 Get:AddToggle({
  Name = "Auto Buy Legendary Sword",
     Description = "",
@@ -10304,66 +9625,7 @@ spawn(function()
 	end;
 end);
 Fruit:AddSection({"Fruits Options"});
-local J5 = {};
-local function i5(I)
-	local e = tostring(I);
-	while true do
-		e, k = e:gsub("^(-?%d+)(%d%d%d)", "%1,%2");
-		if k == 0 then
-			break;
-		end;
-	end;
-	return e;
-end;
-for I, e in pairs(replicated.Remotes.CommF_:InvokeServer("GetFruits", true)) do
-	if e.OnSale == true then
-		local I = i5(e.Price);
-		local K = e.Name;
-		table.insert(J5, K);
-	end;
-end;
-local C5 = {};
-for I, e in pairs(replicated.Remotes.CommF_:InvokeServer("GetFruits", false)) do
-	if e.OnSale == true then
-		local I = i5(e.Price);
-		local K = e.Name;
-		table.insert(C5, K);
-	end;
-end;
-Fruit:AddDropdown({
-	Name = "Select Fruit Stock",
-	Description = "",
-	Options = C5,
-	Default = false,
-	Multi = false,
-	Callback = function(I)
-		_G.SelectFruit = I;
-	end,
-});
-Fruit:AddButton({ Name = "Buy Basic Stock", Description = "", Callback = function()
-		replicated.Remotes.CommF_:InvokeServer("PurchaseRawFruit", _G.SelectFruit);
-	end });
-Fruit:AddDropdown({
-	Name = "Select Mirage Fruit",
-	Description = "",
-	Options = J5,
-	Default = false,
-	Multi = false,
-	Callback = function(I)
-		SelectF_Adv = I;
-	end,
-});
-local M5 = {};
-for I, e in pairs(replicated.Remotes.CommF_:InvokeServer("GetFruits", false)) do
-	if e.OnSale == true then
-		local I = i5(e.Price);
-		local K = e.Name;
-		table.insert(M5, K);
-	end;
-end;
-Fruit:AddButton({ Name = "Buy Mirage Stock", Description = "", Callback = function()
-		replicated.Remotes.CommF_:InvokeServer("PurchaseRawFruit", SelectF_Adv);
-	end });
+
 Fruit:AddToggle({
 	Name  = "Auto Random Fruit",
     Description = "Automatic random devil fruit",
@@ -10386,23 +9648,6 @@ spawn(function()
 				replicated.Remotes.CommF_:InvokeServer("Cousin", "Buy");
 			end;
 		end);
-	end;
-end);
-Get:AddToggle({
-	Name = "Auto Drop Fruit",
-	Description = "Automatic drop devil fruit",
-	Default = false,
-	Callback = function(I)
-		_G.DropFruit = I;
-	end,
-});
-spawn(function()
-	while wait(Sec) do
-		if _G.DropFruit then
-			pcall(function()
-				DropFruits();
-			end);
-		end;
 	end;
 end);
 Fruit:AddToggle({
@@ -10572,37 +9817,7 @@ Setting:AddToggle({
 });
 Setting:AddSection({"Fps"});
 
-Setting:AddButton({
-    Name = "Stretch the screen",
-    Description = "",
-    Callback = function()
-        -- SETAR A RESOLUÇÃO
-        getgenv().Resolution = {
-            [".gg/scripters"] = 0.65
-        }
 
-        local Camera = workspace.CurrentCamera
-
-        -- SE O SCRIPT AINDA NÃO TÁ RODANDO
-        if getgenv().gg_scripters == nil then
-            game:GetService("RunService").RenderStepped:Connect(function()
-                pcall(function()
-                    Camera.CFrame =
-                        Camera.CFrame *
-                        CFrame.new(
-                            0, 0, 0,
-                            1, 0, 0,
-                            0, getgenv().Resolution[".gg/scripters"], 0,
-                            0, 0, 1
-                        )
-                end)
-            end)
-        end
-
-        -- FLAG PRA NÃO DUPLICAR
-        getgenv().gg_scripters = "Aori0001"
-    end
-})
 Setting:AddButton({ Name = "Fps Boost", Description = "", Callback = function()
 		LowCpu();
 	end });
