@@ -7,93 +7,6 @@ local Services = setmetatable({}, {
     end
 })
 
-local function NotificacaoNightMystic(titulo, mensagem)
-    local success = pcall(function()
-        local TweenService = Services.TweenService
-        local CoreGui = Services.CoreGui
-        local LogoID = "rbxassetid://"
-
-        local ScreenGui = Instance.new("ScreenGui")
-        ScreenGui.Name = "NM_Notify"
-        ScreenGui.ResetOnSpawn = false
-        ScreenGui.Parent = CoreGui
-        
-        local Frame = Instance.new("Frame")
-        Frame.Parent = ScreenGui
-        Frame.BackgroundColor3 = Color3.fromRGB(8, 8, 8)
-        Frame.Position = UDim2.new(1, 20, 0.85, 0)
-        Frame.Size = UDim2.new(0, 280, 0, 65)
-        Frame.BorderSizePixel = 0
-        
-        local UICorner = Instance.new("UICorner")
-        UICorner.CornerRadius = UDim.new(0, 10)
-        UICorner.Parent = Frame
-        
-        local UIStroke = Instance.new("UIStroke")
-        UIStroke.Parent = Frame
-        UIStroke.Color = Color3.fromRGB(45, 45, 45)
-        UIStroke.Thickness = 1
-
-        local Logo = Instance.new("ImageLabel")
-        Logo.Parent = Frame
-        Logo.BackgroundTransparency = 1
-        Logo.Position = UDim2.new(0, 10, 0, 10)
-        Logo.Size = UDim2.new(0, 45, 0, 45)
-        Logo.Image = LogoID
-        Logo.ScaleType = Enum.ScaleType.Fit
-
-        local Title = Instance.new("TextLabel")
-        Title.Parent = Frame
-        Title.BackgroundTransparency = 1
-        Title.Position = UDim2.new(0, 65, 0, 12)
-        Title.Size = UDim2.new(1, -70, 0, 20)
-        Title.Font = Enum.Font.GothamBold
-        Title.Text = titulo
-        Title.TextColor3 = Color3.fromRGB(255, 255, 255)
-        Title.TextSize = 14
-        Title.TextXAlignment = Enum.TextXAlignment.Left
-        Title.TextTruncate = Enum.TextTruncate.AtEnd
-
-        local Msg = Instance.new("TextLabel")
-        Msg.Parent = Frame
-        Msg.BackgroundTransparency = 1
-        Msg.Position = UDim2.new(0, 65, 0, 32)
-        Msg.Size = UDim2.new(1, -70, 0, 20)
-        Msg.Font = Enum.Font.GothamMedium
-        Msg.Text = mensagem
-        Msg.TextColor3 = Color3.fromRGB(200, 200, 200)
-        Msg.TextSize = 12
-        Msg.TextXAlignment = Enum.TextXAlignment.Left
-        Msg.TextTruncate = Enum.TextTruncate.AtEnd
-        
-        local tweenIn = TweenService:Create(
-            Frame, 
-            TweenInfo.new(0.5, Enum.EasingStyle.Back, Enum.EasingDirection.Out),
-            {Position = UDim2.new(1, -300, 0.85, 0)}
-        )
-        tweenIn:Play()
-
-        task.delay(10, function()
-            if Frame and Frame.Parent then
-                local tweenOut = TweenService:Create(
-                    Frame,
-                    TweenInfo.new(0.5, Enum.EasingStyle.Quad, Enum.EasingDirection.In),
-                    {Position = UDim2.new(1, 20, 0.85, 0)}
-                )
-                tweenOut:Play()
-                tweenOut.Completed:Wait()
-                ScreenGui:Destroy()
-            end
-        end)
-    end)
-    
-    if not success then
-        warn("[Abacaxi] Erro ao exibir notificação")
-    end
-end
-
-NotificacaoNightMystic("Darkness", "Load Script Successfully")
-
 
 local HttpService = Services.HttpService
 local FolderName = "Darkness"
@@ -2479,6 +2392,11 @@ local Others = Library:MakeTab({
     Icon = "rbxassetid://10734975692"
 })
 
+local Get = Library:MakeTab({
+    Title = "Misc Farming",
+    Icon = "rbxassetid://10734975486"
+})
+
 local Event = Library:MakeTab({
     Title = "Sea Event",
     Icon = "rbxassetid://10747376931"
@@ -2505,11 +2423,6 @@ local Teleport = Library:MakeTab({
     Icon = "rbxassetid://10734886004"
 })
 
-local Get = Library:MakeTab({
-    Title = "Get Items And Upgrade",
-    Icon = "rbxassetid://10734975486"
-})
-
 local Fruit = Library:MakeTab({
     Title = "Raid And Fruit",
     Icon = "rbxassetid://10709790875"
@@ -2527,76 +2440,7 @@ local Setting = Library:MakeTab({
 
 
 
-Shop:AddSection("Fighting Shop")
-Shop:AddButton({
-    Name = "Black Leg",
-    Callback = function()
-        game:GetService("ReplicatedStorage").Remotes.CommF_:InvokeServer("BuyBlackLeg")
-    end
-})
-Shop:AddButton({
-    Name = "Fishman Karate",
-    Callback = function()
-        game:GetService("ReplicatedStorage").Remotes.CommF_:InvokeServer("BuyFishmanKarate")
-    end
-})
-Shop:AddButton({
-    Name = "Electro",
-    Callback = function()
-        game:GetService("ReplicatedStorage").Remotes.CommF_:InvokeServer("BuyElectro")
-    end
-})
-Shop:AddButton({
-    Name = "Dragon Breath",
-    Callback = function()
-        game:GetService("ReplicatedStorage").Remotes.CommF_:InvokeServer("BlackbeardReward","DragonClaw","1")
-        game:GetService("ReplicatedStorage").Remotes.CommF_:InvokeServer("BlackbeardReward","DragonClaw","2")
-    end
-})
-Shop:AddButton({
-    Name = "SuperHuman",
-    Callback = function()
-        game:GetService("ReplicatedStorage").Remotes.CommF_:InvokeServer("BuySuperhuman")
-    end
-})
-Shop:AddButton({
-    Name = "Death Step",
-    Callback = function()
-        game:GetService("ReplicatedStorage").Remotes.CommF_:InvokeServer("BuyDeathStep")
-    end
-})
-Shop:AddButton({
-    Name = "Sharkman Karate",
-    Callback = function()
-        game:GetService("ReplicatedStorage").Remotes.CommF_:InvokeServer("BuySharkmanKarate",true)
-        game:GetService("ReplicatedStorage").Remotes.CommF_:InvokeServer("BuySharkmanKarate")
-    end
-})
-Shop:AddButton({
-    Name = "Electric Claw",
-    Callback = function()
-        game:GetService("ReplicatedStorage").Remotes.CommF_:InvokeServer("BuyElectricClaw")
-    end
-})
-Shop:AddButton({
-    Name = "Dragon Talon",
-    Callback = function()
-        game:GetService("ReplicatedStorage").Remotes.CommF_:InvokeServer("BuyDragonTalon")
-    end
-})
-Shop:AddButton({
-    Name = "God Human",
-    Callback = function()
-        game:GetService("ReplicatedStorage").Remotes.CommF_:InvokeServer("BuyGodhuman")
-    end
-})
-Shop:AddButton({
-    Name = "Sanguine Art",
-    Callback = function()
-        game:GetService("ReplicatedStorage").Remotes.CommF_:InvokeServer("BuySanguineArt", true)
-        game:GetService("ReplicatedStorage").Remotes.CommF_:InvokeServer("BuySanguineArt")
-    end
-})
+
 Shop:AddSection("Sword")
 Shop:AddButton({
     Name = "Cutlass [ 1,000 Beli ]",
@@ -3982,51 +3826,7 @@ Setting:AddButton({
     end
 })
 Setting:AddSection({"Setting Farm"})
-Setting:AddButton({
-    Name = "Stop Tween",
-    Description = "",
-    Callback = function()
-        local plr = game.Players.LocalPlayer
-        local char = plr.Character
-        if not char then return end
 
-        local hrp = char:FindFirstChild("HumanoidRootPart")
-        local hum = char:FindFirstChild("Humanoid")
-
-        -- 🔴 PARA O TWEEN (usa a variável que JÁ EXISTE)
-        shouldTween = false
-
-        -- 🔓 Solta o player
-        if hrp then
-            hrp.Anchored = false
-
-            -- Remove coisas que costumam travar
-            for _, v in pairs(hrp:GetChildren()) do
-                if v:IsA("BodyVelocity")
-                or v:IsA("BodyPosition")
-                or v:IsA("BodyGyro") then
-                    v:Destroy()
-                end
-            end
-        end
-
-        if hum then
-            hum.PlatformStand = false
-            hum.Sit = false
-            hum.WalkSpeed = 16
-            hum.JumpPower = 50
-            hum.AutoRotate = true
-            hum:ChangeState(Enum.HumanoidStateType.Running)
-        end
-
-        -- Libera o farm de novo
-        getgenv().OnFarm = true
-
-        -- Permite novos tweens depois
-        task.wait()
-        shouldTween = true
-    end
-})
 
 Setting:AddToggle({
 	Name = "Auto Attack",
@@ -4149,7 +3949,7 @@ spawn(function()
 	end;
 end);
 Setting:AddToggle({
-	Name = "Anti AFK",
+	Name = "Anti Afk",
 	Description = "",
 	Default = true,
 	Callback = function(I)
@@ -4205,7 +4005,7 @@ Setting:AddTextBox({
 })
 
 Setting:AddTextBox({
-    Title = "Select Farm Height",
+    Title = "Select Farm distance",
     Description = "",
     PlaceHolder = "20",
     Default = tostring(_G.MobHeight),
@@ -4220,8 +4020,8 @@ Setting:AddTextBox({
 Setting:AddTextBox({
     Title = "Tween Speed",
     Description = "",
-    PlaceHolder = "300",
-    Default = "300",
+    PlaceHolder = "360",
+    Default = "360",
     Callback = function(I)
         if tonumber(I) then
             getgenv().TweenSpeedFar = tonumber(I)
@@ -10926,6 +10726,5 @@ end)
 _ENV.rz_FastAttack = FastAttack
 FastAttackModule.FastAttack = FastAttack
 
-NotificacaoNightMystic("Darkness Hub", "Script Loaded Successfully")
 
 return FastAttackModulem
