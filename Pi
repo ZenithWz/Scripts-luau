@@ -674,9 +674,9 @@ statsSetings = function(I, e)
 _G = _G or {}
 _B = false
 PosMon = nil
-_G.BringRange = _G.BringRange or 235
+_G.BringRange = _G.BringRange or 250
 _G.MaxBringMobs = _G.MaxBringMobs or 3 
-_G.SpeedB = _G.SpeedB or 250 
+_G.SpeedB = _G.SpeedB or 190 
 
 local TweenService = game:GetService("TweenService")
 
@@ -1163,188 +1163,76 @@ Hop = function()
 			end;
 		end);
 	end;
-local workspace = game:GetService("Workspace")
-local players = game:GetService("Players")
-local tweenService = game:GetService("TweenService")
-local runService = game:GetService("RunService")
-local plr = players.LocalPlayer
+local C = Instance.new("Part", workspace);
+C.Size = Vector3.new(1, 1, 1);
+C.Name = "Rip_Indra";
+C.Anchored = true;
+C.CanCollide = false;
+C.CanTouch = false;
+C.Transparency = 1;
 
--- Definição dos Mares (Ids do Blox Fruits)
-local PlaceId = game.PlaceId
-local sea1 = PlaceId == 2753915549
-local sea2 = PlaceId == 4442272183
-local sea3 = PlaceId == 7449423635
-
--- =======================
--- CONFIGURAÇÃO DO PROXY (C)
--- =======================
-local C = Instance.new("Part", workspace)
-C.Size = Vector3.new(1, 1, 1)
-C.Name = "Rip_Indra"
-C.Anchored = true
-C.CanCollide = false
-C.CanTouch = false
-C.Transparency = 1
-
-local M = workspace:FindFirstChild(C.Name)
+local M = workspace:FindFirstChild(C.Name);
 if M and M ~= C then
-    M:Destroy()
-end
-
--- =======================
--- LOOP DE SINCRONIZAÇÃO
--- =======================
-task.spawn(function()
-    while task.wait() do
-        if C and C.Parent == workspace then
-            if shouldTween then
-                (getgenv()).OnFarm = true
-            else
-                (getgenv()).OnFarm = false
-            end
-        else
-            (getgenv()).OnFarm = false
-        end
-    end
-end)
+	M:Destroy();
+end;
 
 task.spawn(function()
-    repeat task.wait() until plr.Character and plr.Character.PrimaryPart
+	while task.wait() do
+		if C and C.Parent == workspace then
+			if shouldTween then
+				(getgenv()).OnFarm = true;
+			else
+				(getgenv()).OnFarm = false;
+			end;
+		else
+			(getgenv()).OnFarm = false;
+		end;
+	end;
+end);
 
-    C.CFrame = plr.Character.PrimaryPart.CFrame
+task.spawn(function()
+	local I = game.Players.LocalPlayer;
+	repeat task.wait() until I.Character and I.Character.PrimaryPart;
 
-    while task.wait() do
-        pcall(function()
-            if (getgenv()).OnFarm then
-                if C and C.Parent == workspace then
-                    local e = plr.Character and plr.Character.PrimaryPart
-                    if e and (e.Position - C.Position).Magnitude <= 200 then
-                        e.CFrame = C.CFrame
-                    else
-                        C.CFrame = e.CFrame
-                    end
-                end
+	C.CFrame = I.Character.PrimaryPart.CFrame;
 
-                local e = plr.Character
-                if e then
-                    for _, v in pairs(e:GetChildren()) do
-                        if v:IsA("BasePart") then
-                            v.CanCollide = false
-                        end
-                    end
-                end
+	while task.wait() do
+		pcall(function()
+			if (getgenv()).OnFarm then
+				if C and C.Parent == workspace then
+					local e = I.Character and I.Character.PrimaryPart;
+					if e and (e.Position - C.Position).Magnitude <= 200 then
+						e.CFrame = C.CFrame;
+					else
+						C.CFrame = e.CFrame;
+					end;
+				end;
 
-            else
-                local e = plr.Character
-                if e then
-                    for _, v in pairs(e:GetChildren()) do
-                        if v:IsA("BasePart") then
-                            v.CanCollide = true
-                        end
-                    end
-                end
-            end
-        end)
-    end
-end)
+				local e = I.Character;
+				if e then
+					for _, v in pairs(e:GetChildren()) do
+						if v:IsA("BasePart") then
+							v.CanCollide = false;
+						end;
+					end;
+				end;
 
--- =======================
--- SISTEMA DE PORTAIS (BYPASS)
--- =======================
-
--- Função simples para checar item no inventário (substituindo remote específico)
-function Check_Tool_Remote(ItemName)
-    if plr.Backpack:FindFirstChild(ItemName) or (plr.Character and plr.Character:FindFirstChild(ItemName)) then
-        return true
-    end
-    return false
-end
-
-local Locations = {
-    sea1 = function()
-        return {
-            ["FishmanSea1"]  = Vector3.new(61163, 11, 1819), -- Ajustado para posição padrão aproximada ou pegar do mapa se existir
-            ["Island Sky 2"] = Vector3.new(-4839, 717, -2619),
-            ["Island Sky 1"] = Vector3.new(-4869, 716, -2615),
-        }
-    end,
-    sea2 = function()
-        return {
-            ["CaFe"] = Vector3.new(-288, 305, 613),
-            ["Swan Room"] = Vector3.new(2284, 15, 897),
-            ["Ghost ShipInterior"] = Vector3.new(-6518, 83, -145) -- Assumindo posição direta
-        }
-    end,
-    sea3 = {
-        Helm = {
-            ["Castle On The Sea"] = Vector3.new(-5058, 314, -3155),
-            ["Mansion"] = Vector3.new(-12463, 374, -7523),
-        }
-    }
-}
-
--- Tentativa de pegar posições dinâmicas se o mapa estiver carregado
-pcall(function()
-    if sea1 and workspace.Map:FindFirstChild("TeleportSpawn") then
-         Locations.sea1 = function()
-            return {
-                ["FishmanSea1"]  = workspace.Map.TeleportSpawn.EntrancePoint.Position,
-                ["Island Sky 2"] = workspace.Map.SkyArea2.PathwayHouse.EntrancePoint.Position,
-                ["Island Sky 1"] = workspace.Map.SkyArea1.PathwayTemple.ExitPoint.Position,
-            }
-         end
-    end
-    if sea2 and workspace.Map:FindFirstChild("GhostShipInterior") then
-         Locations.sea2 = function()
-            return {
-                ["CaFe"] = Vector3.new(-288, 305, 613),
-                ["Swan Room"] = Vector3.new(2284, 15, 897),
-                ["Ghost ShipInterior"] = workspace.Map.GhostShipInterior.TeleportSpawn.Position,
-                ["OutGhost ShipInterior"] = Vector3.new(-6518, 83, -145),
-            }
-         end
-    end
-end)
-
-local TableLocations = {}
-
-if sea3 then
-    TableLocations = {}
-    if Check_Tool_Remote("Valkyrie Helm") then
-        if Locations.sea3 and Locations.sea3.Helm then
-            for k, v in pairs(Locations.sea3.Helm) do
-                TableLocations[k] = v
-            end
-        end
-    end
-elseif sea1 then
-    TableLocations = Locations.sea1()
-else
-    TableLocations = Locations.sea2()
-end
-
-function GetPortal(x)
-    local Max, Choose = math.huge, nil
-    local IslandName
-    
-    -- Se x for CFrame, pega Position
-    local targetPos = (typeof(x) == "CFrame") and x.Position or x
-
-    if TableLocations and next(TableLocations) then
-        for k, v in pairs(TableLocations) do
-            local dist = (v - targetPos).Magnitude
-            if dist <= Max then
-                Max = dist
-                Choose = v
-                IslandName = k
-            end
-        end
-    end
-    return Choose, IslandName
-end
+			else
+				local e = I.Character;
+				if e then
+					for _, v in pairs(e:GetChildren()) do
+						if v:IsA("BasePart") then
+							v.CanCollide = true;
+						end;
+					end;
+				end;
+			end;
+		end);
+	end;
+end);
 
 -- =======================
--- TWEEN AJUSTADO POR DISTÂNCIA E PORTAIS
+-- TWEEN AJUSTADO POR DISTÂNCIA
 -- =======================
 
 -- [[ VARIÁVEIS PARA O SEU INPUT ]] --
@@ -1352,86 +1240,63 @@ getgenv().TweenSpeedFar = 300   -- Velocidade Padrão (Longe)
 getgenv().TweenSpeedNear = 600  -- Velocidade Boost (Perto <= 15 studs)
 
 _tp = function(I)
-    local e = plr.Character
-    if not e or not e:FindFirstChild("HumanoidRootPart") then
-        return
-    end
+local e = plr.Character;
+if not e or not e:FindFirstChild("HumanoidRootPart") then
+return;
+end;
 
-    local HRP = e.HumanoidRootPart
-    
-    -- Destino final (CFrame)
-    local targetCFrame = I
-    local targetPos = targetCFrame.Position
+local HRP = e.HumanoidRootPart;  
 
-    -- Desativar farm enquanto tweena
-    shouldTween = true
-    getgenv().OnFarm = false
+-- Desativar farm enquanto tweena  
+shouldTween = true  
+getgenv().OnFarm = false  
 
-    -- Garantir que não está ancorado
-    if HRP.Anchored then
-        HRP.Anchored = false
-        task.wait()
-    end
+-- Garantir que não está ancorado  
+if HRP.Anchored then  
+	HRP.Anchored = false  
+	task.wait()  
+end  
 
-    -- ===============================
-    -- LÓGICA DE BYPASS (PORTAL)
-    -- ===============================
-    -- Verifica se existe um portal perto do destino que encurte a viagem
-    local BestPortal, PortalName = GetPortal(targetCFrame)
-    
-    if BestPortal then
-        local distCurrent = (C.Position - targetPos).Magnitude
-        local distFromPortal = (BestPortal - targetPos).Magnitude
-        
-        -- Se a distância do portal até o destino for menor que a atual E
-        -- Nós estamos longe desse portal (para evitar teleportar pro mesmo lugar)
-        if distFromPortal < distCurrent and (C.Position - BestPortal).Magnitude > 500 then
-            -- Teleporta o Proxy (C) para o Portal
-            C.CFrame = CFrame.new(BestPortal)
-            task.wait(0.1) -- Pequeno delay para processar o teleporte
-        end
-    end
+local dist = (I.Position - HRP.Position).Magnitude  
 
-    -- ===============================
-    -- CÁLCULO DE VELOCIDADE
-    -- ===============================
-    local dist = (targetPos - C.Position).Magnitude
-    local speed = dist <= 15 and (getgenv().TweenSpeedNear or 600) or (getgenv().TweenSpeedFar or 300)
+-- ===============================  
+--  SE ESTIVER ATÉ 15 STUDS → USA A VELOCIDADE DE PERTO
+--  CASO CONTRÁRIO → USA A VELOCIDADE PADRÃO
+-- ===============================  
+local speed = dist <= 15 and (getgenv().TweenSpeedNear or 600) or (getgenv().TweenSpeedFar or 300)
 
-    local info = TweenInfo.new(dist / speed, Enum.EasingStyle.Linear)
-    local tween = tweenService:Create(C, info, { CFrame = targetCFrame })
+local info = TweenInfo.new(dist / speed, Enum.EasingStyle.Linear)  
+local tween = game:GetService("TweenService"):Create(C, info, { CFrame = I })  
 
-    -- Caso esteja sentado
-    if e:FindFirstChild("Humanoid") and e.Humanoid.Sit == true then
-        C.CFrame = CFrame.new(C.Position.X, targetPos.Y, C.Position.Z)
-    end
+-- Caso esteja sentado  
+if e.Humanoid.Sit == true then  
+	C.CFrame = CFrame.new(C.Position.X, I.Y, C.Position.Z)  
+end  
 
-    tween:Play()
+tween:Play()  
 
-    -- Anti travamento / controle
-    task.spawn(function()
-        while tween.PlaybackState == Enum.PlaybackState.Playing do
-            if not shouldTween then
-                tween:Cancel()
-                break
-            end
-            task.wait(0.1)
-        end
-        getgenv().OnFarm = true
-    end)
+-- Anti travamento / controle  
+task.spawn(function()  
+	while tween.PlaybackState == Enum.PlaybackState.Playing do  
+		if not shouldTween then  
+			tween:Cancel()  
+			break  
+		end  
+		task.wait(.1)  
+	end  
+
+	getgenv().OnFarm = true  
+end)
+
 end
 
 TeleportToTarget = function(I)
-    _tp(I)
+_tp(I)
 end
 
 notween = function(I)
-    if plr.Character and plr.Character:FindFirstChild("HumanoidRootPart") then
-        plr.Character.HumanoidRootPart.CFrame = I
-        C.CFrame = I
-    end
+plr.Character.HumanoidRootPart.CFrame = I
 end
-
 
 
 function BTP(I)
