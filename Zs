@@ -562,150 +562,75 @@ statsSetings = function(I, e)
 
 
 
-
---==================================================
--- VARIÁVEIS DE CONTROLE NECESSÁRIAS
---==================================================
 _G = _G or {}
-
 _B = false
 PosMon = nil
-
 _G.BringRange = _G.BringRange or 235
-_G.MaxBringMobs = _G.MaxBringMobs or 3 -- LIMITE DE MOBS
-
-_G.FarmPriorityElf = _G.FarmPriorityElf or false
-_G.FarmMastery_S   = _G.FarmMastery_S or false
+_G.MaxBringMobs = _G.MaxBringMobs or 3 
+_G.SpeedB = _G.SpeedB or 250 
 
 local TweenService = game:GetService("TweenService")
-local TweenInfoBring = TweenInfo.new(
-    0.45, -- velocidade do tween
-    Enum.EasingStyle.Linear,
-    Enum.EasingDirection.Out
-)
 
---==================================================
--- FUNÇÃO: VERIFICA SE QUALQUER FARM ESTÁ ATIVO
---==================================================
-local function FarmAtivo()
-    -- PRIORIDADE ABSOLUTA (ELF)
-    if _G.FarmPriorityElf or _G.FarmElfLevelCustom then
-        return true
+local function IsBoss(mobName)
+    for _, boss in ipairs(BossList or {}) do
+        if mobName == boss then return true end
     end
-
-    -- AUTO MASTERY ALL SWORD (INDEPENDENTE DO START FARM)  
-    if _G.FarmMastery_S then  
-        return true  
-    end  
-
-    -- OUTROS FARMS (DEPENDENTES DO START FARM)  
-    return _G.StartFarm and (
-        _G.Level or  
-        _G.AutoFarm_Bone or  
-        _G.AutoFarm_Cake or  
-        _G.FarmMastery_Dev or  
-        _G.FarmMastery_G or  
-        (getgenv()).AutoMaterial or  
-        _G.AutoTyrant or
-        _G.SailBoat_Hydra or _G.WardenBoss or _G.AutoFactory or _G.HighestMirage or _G.HCM or _G.PGB or _G.Leviathan1 or _G.UPGDrago or _G.Complete_Trials or _G.TpDrago_Prehis or _G.BuyDrago or _G.AutoFireFlowers or _G.DT_Uzoth or _G.AutoBerry or _G.Prehis_Find or _G.Prehis_Skills or _G.Prehis_DB or _G.Prehis_DE or _G.FarmBlazeEM or _G.Dojoo or _G.CollectPresent or _G.AutoLawKak or _G.TpLab or _G.AutoPhoenixF or _G.AutoFarmChest or _G.AutoHytHallow or _G.LongsWord or _G.BlackSpikey or _G.AutoHolyTorch or _G.TrainDrago or _G.AutoSaber or _G.FarmMastery_Dev or _G.CitizenQuest or _G.AutoEctoplasm or _G.KeysRen or _G.Auto_Rainbow_Haki or _G.obsFarm or _G.AutoBigmom or _G.Doughv2 or _G.AuraBoss or _G.Raiding or _G.Auto_Cavender or _G.TpPly or _G.Bartilo_Quest or _G.Level or _G.FarmEliteHunt or _G.AutoZou or _G.AutoFarm_Bone or (getgenv()).AutoMaterial or _G.CraftVM or _G.FrozenTP or _G.TPDoor or _G.AcientOne or _G.AutoFarmNear or _G.AutoRaidCastle or _G.DarkBladev3 or _G.AutoFarmRaid or _G.Auto_Cake_Prince or _G.Addealer or _G.TPNpc or _G.TwinHook or _G.FindMirage or _G.FarmChestM or _G.Shark or _G.TerrorShark or _G.Piranha or _G.MobCrew or _G.SeaBeast1 or _G.FishBoat or _G.Auto or _G.AutoPoleV2 or _G.Auto_SuperHuman or _G.AutoDeathStep or _G.Auto_SharkMan_Karate or _G.Auto_Electric_Claw or _G.AutoDragonTalon or _G.Auto_Def_DarkCoat or _G.Auto_God_Human or _G.Auto_Tushita or _G.AutoMatSoul or _G.AutoKenVTWO or _G.AutoSerpentBow or _G.AutoFMon or _G.Auto_Soul_Guitar or _G.TPGEAR or _G.AutoSaw or _G.AutoTridentW2 or _G.Auto_StartRaid or _G.AutoEvoRace or _G.AutoGetQuestBounty or _G.MarinesCoat or _G.TravelDres or _G.Defeating or _G.DummyMan or _G.Auto_Yama or _G.Auto_SwanGG or _G.SwanCoat or _G.AutoEcBoss or _G.Auto_Mink or _G.Auto_Human or _G.Auto_Skypiea or _G.Auto_Fish or _G.CDK_TS or _G.CDK_YM or _G.CDK or _G.AutoFarmGodChalice or _G.AutoFistDarkness or _G.AutoMiror or _G.Teleport or _G.AutoKilo or _G.AutoGetUsoap or _G.Praying or _G.TryLucky or _G.AutoColShad or _G.AutoUnHaki or _G.Auto_DonAcces or _G.AutoRipIngay or _G.DragoV3 or _G.DragoV1 or _G.SailBoats or NextIs or _G.FarmGodChalice or _G.IceBossRen or senth or senth2 or _G.Lvthan or _G.beasthunter or _G.DangerLV or _G.Relic123 or _G.tweenKitsune or _G.Collect_Ember or _G.AutofindKitIs or _G.snaguine or _G.TwFruits or _G.tweenKitShrine or _G.Tp_LgS or _G.Tp_MasterA or _G.tweenShrine or _G.FarmMastery_G or _G.FarmMastery_S
-    )
-end
-
---==================================================
--- FUNÇÃO: IGNORA MOBS INDESEJADOS
---==================================================
-local function IsRaidMob(mob)
-    local n = mob.Name:lower()
-
-    if n:find("raid") or n:find("microchip") or n:find("island") then  
-        return true  
-    end  
-
-    if mob:GetAttribute("IsRaid")  
-        or mob:GetAttribute("RaidMob")  
-        or mob:GetAttribute("IsBoss") then  
-        return true  
-    end  
-
-    local hum = mob:FindFirstChild("Humanoid")  
-    if hum and hum.WalkSpeed == 0 then  
-        return true  
-    end  
-
-    if mob.Parent and tostring(mob.Parent):lower():find("_worldorigin") then  
-        return true  
-    end  
-
     return false
 end
 
---==================================================
--- FUNÇÃO PRINCIPAL: BRING
---==================================================
-BringEnemy = function()
-    if not FarmAtivo() or not _B then return end
+local function BringEnemy()
+    if not _B or not PosMon then return end
+    local plr = game.Players.LocalPlayer
+    local char = plr.Character
+    local hrp = char and char:FindFirstChild("HumanoidRootPart")
+    if not hrp then return end
 
-    local plr = game.Players.LocalPlayer  
-    local char = plr.Character  
-    local hrp = char and char:FindFirstChild("HumanoidRootPart")  
-    if not hrp then return end  
+    pcall(function() sethiddenproperty(plr, "SimulationRadius", math.huge) end)
+    
+    local count = 0
+    for _, mob in pairs(workspace.Enemies:GetChildren()) do
+        if count >= (_G.MaxBringMobs) then break end
+        local hum = mob:FindFirstChild("Humanoid")
+        local root = mob:FindFirstChild("HumanoidRootPart")
+        
+        if hum and root and hum.Health > 0 and not IsBoss(mob.Name) then
+            if (root.Position - hrp.Position).Magnitude <= (_G.BringRange) then
+                count = count + 1
+                root.CanCollide = false
+                root.AssemblyLinearVelocity = Vector3.zero
+                root.AssemblyAngularVelocity = Vector3.zero
+                
+                if hum:FindFirstChild("Animator") then hum.Animator:Destroy() end
+                
+                if not root:FindFirstChild("BodyVelocity") then
+                    local bv = Instance.new("BodyVelocity")
+                    bv.Name = "BodyVelocity"
+                    bv.MaxForce = Vector3.new(1e9, 1e9, 1e9)
+                    bv.Velocity = Vector3.zero
+                    bv.Parent = root
+                end
 
-    -- Simulation Radius  
-    pcall(function()  
-        sethiddenproperty(plr, "SimulationRadius", math.huge)  
-    end)  
-
-    local targetPos = PosMon or hrp.Position  
-    local enemies = workspace.Enemies:GetChildren()  
-    local count = 0  
-
-    for _, mob in ipairs(enemies) do  
-        if count >= _G.MaxBringMobs then break end  
-
-        local hum = mob:FindFirstChild("Humanoid")  
-        local root = mob:FindFirstChild("HumanoidRootPart")  
-
-        if hum and root and hum.Health > 0 and not IsRaidMob(mob) then  
-            local dist = (root.Position - targetPos).Magnitude  
-
-            if dist <= _G.BringRange and not root:GetAttribute("Tweening") then  
-                count += 1  
-                root:SetAttribute("Tweening", true)  
-
-                local tween = TweenService:Create(  
-                    root,  
-                    TweenInfoBring,  
-                    { CFrame = CFrame.new(targetPos) }  
-                )  
-
-                tween:Play()  
-                tween.Completed:Once(function()  
-                    if root then  
-                        root:SetAttribute("Tweening", false)  
-                    end  
-                end)  
-            end  
-        end  
+                local distToTarget = (root.Position - PosMon).Magnitude
+                if distToTarget > 1 then
+                    local tInfo = TweenInfo.new(distToTarget / (_G.SpeedB), Enum.EasingStyle.Linear)
+                    TweenService:Create(root, tInfo, {CFrame = CFrame.new(PosMon)}):Play()
+                else
+                    root.CFrame = CFrame.new(PosMon)
+                end
+            end
+        end
     end
 end
 
---==================================================
--- LOOP CONTROLADOR
---==================================================
 task.spawn(function()
-    while task.wait(1) do
-        if FarmAtivo() then
-            _B = true
+    while task.wait(0.1) do
+        if _B and PosMon then
             BringEnemy()
-            task.wait(3)
-            _B = false  
-            task.wait(5)  
-        else  
-            _B = false  
-            task.wait(1)  
-        end  
+        end
     end
 end)
+
+
 Useskills = function(I, e)
 		if I == "Melee" then
 			weaponSc("Melee");
