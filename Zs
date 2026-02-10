@@ -3948,7 +3948,7 @@ Setting:AddTextBox({
         end
     end,
 });
-Others:AddSection({"Fishing"})
+
 -- =========================================================
 -- NOVO SISTEMA DE PESCA (COM SAVE SYSTEM INTEGRADO)
 -- =========================================================
@@ -8385,6 +8385,7 @@ spawn(function()
 end);
 end
 if World2 or World3 then
+Get:AddSection({"Skull Guitar"});
 Get:AddToggle({
 	Name = "Auto Farm Material Skull Guitar",
 	Description = "",
