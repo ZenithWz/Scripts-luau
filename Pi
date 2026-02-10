@@ -671,22 +671,15 @@ statsSetings = function(I, e)
 
 
 
---==================================================
--- VARIÁVEIS DE CONTROLE (Atualizadas)
---==================================================
 _G = _G or {}
 _B = false
 PosMon = nil
-
 _G.BringRange = _G.BringRange or 235
 _G.MaxBringMobs = _G.MaxBringMobs or 3 
-_G.SpeedB = _G.SpeedB or 100 -- Velocidade do Bring (usado no novo cálculo)
+_G.SpeedB = _G.SpeedB or 250 
 
 local TweenService = game:GetService("TweenService")
 
---==================================================
--- FUNÇÃO: VERIFICA SE QUALQUER FARM ESTÁ ATIVO
---==================================================
 local function FarmAtivo()
     if _G.FarmPriorityElf or _G.FarmElfLevelCustom or _G.FarmMastery_S or _G.FarmMastery_G or _G.FarmMastery_Dev then
         return true
@@ -696,16 +689,43 @@ local function FarmAtivo()
             return true
         end
     end
-    -- Simplificação da sua lista extensa para manter performance
-    if (getgenv()).AutoMaterial or _G.SailBoat_Hydra or _G.AutoFarmChest or _G.Raiding or _G.FarmEliteHunt or _G.Auto_God_Human or _G.CDK then
+    local OutrosFarms = (
+        (getgenv()).AutoMaterial or _G.SailBoat_Hydra or _G.WardenBoss or _G.AutoFactory or 
+        _G.HighestMirage or _G.HCM or _G.PGB or _G.Leviathan1 or _G.UPGDrago or 
+        _G.Complete_Trials or _G.TpDrago_Prehis or _G.BuyDrago or _G.AutoFireFlowers or 
+        _G.DT_Uzoth or _G.AutoBerry or _G.Prehis_Find or _G.Prehis_Skills or _G.Prehis_DB or 
+        _G.Prehis_DE or _G.FarmBlazeEM or _G.Dojoo or _G.CollectPresent or _G.AutoLawKak or 
+        _G.TpLab or _G.AutoPhoenixF or _G.AutoFarmChest or _G.AutoHytHallow or _G.LongsWord or 
+        _G.BlackSpikey or _G.AutoHolyTorch or _G.TrainDrago or _G.AutoSaber or _G.CitizenQuest or 
+        _G.AutoEctoplasm or _G.KeysRen or _G.Auto_Rainbow_Haki or _G.obsFarm or _G.AutoBigmom or 
+        _G.Doughv2 or _G.AuraBoss or _G.Raiding or _G.Auto_Cavender or _G.TpPly or 
+        _G.Bartilo_Quest or _G.FarmEliteHunt or _G.AutoZou or _G.CraftVM or _G.FrozenTP or 
+        _G.TPDoor or _G.AcientOne or _G.AutoFarmNear or _G.AutoRaidCastle or _G.DarkBladev3 or 
+        _G.AutoFarmRaid or _G.Addealer or _G.TPNpc or _G.TwinHook or _G.FindMirage or 
+        _G.FarmChestM or _G.Shark or _G.TerrorShark or _G.Piranha or _G.MobCrew or 
+        _G.SeaBeast1 or _G.FishBoat or _G.Auto or _G.AutoPoleV2 or _G.Auto_SuperHuman or 
+        _G.AutoDeathStep or _G.Auto_SharkMan_Karate or _G.Auto_Electric_Claw or 
+        _G.AutoDragonTalon or _G.Auto_Def_DarkCoat or _G.Auto_God_Human or _G.Auto_Tushita or 
+        _G.AutoMatSoul or _G.AutoKenVTWO or _G.AutoSerpentBow or _G.AutoFMon or 
+        _G.Auto_Soul_Guitar or _G.TPGEAR or _G.AutoSaw or _G.AutoTridentW2 or 
+        _G.Auto_StartRaid or _G.AutoEvoRace or _G.AutoGetQuestBounty or _G.MarinesCoat or 
+        _G.TravelDres or _G.Defeating or _G.DummyMan or _G.Auto_Yama or _G.Auto_SwanGG or 
+        _G.SwanCoat or _G.AutoEcBoss or _G.Auto_Mink or _G.Auto_Human or _G.Auto_Skypiea or 
+        _G.Auto_Fish or _G.CDK_TS or _G.CDK_YM or _G.CDK or _G.AutoFarmGodChalice or 
+        _G.AutoFistDarkness or _G.AutoMiror or _G.Teleport or _G.AutoKilo or 
+        _G.AutoGetUsoap or _G.Praying or _G.TryLucky or _G.AutoColShad or _G.AutoUnHaki or 
+        _G.Auto_DonAcces or _G.AutoRipIngay or _G.DragoV3 or _G.DragoV1 or _G.SailBoats or 
+        NextIs or _G.FarmGodChalice or _G.IceBossRen or senth or senth2 or _G.Lvthan or 
+        _G.beasthunter or _G.DangerLV or _G.Relic123 or _G.tweenKitsune or _G.Collect_Ember or 
+        _G.AutofindKitIs or _G.snaguine or _G.TwFruits or _G.tweenKitShrine or _G.Tp_LgS or 
+        _G.Tp_MasterA or _G.tweenShrine
+    )
+    if OutrosFarms or _G.BringMobsUser then
         return true
     end
-    return _G.BringMobsUser -- Retorna true se o botão de Bring estiver ligado
+    return false
 end
 
---==================================================
--- FUNÇÃO: IGNORA MOBS INDESEJADOS (BOSSES)
---==================================================
 local function IsBoss(mobName)
     for _, boss in ipairs(BossList or {}) do
         if mobName == boss then return true end
@@ -713,42 +733,27 @@ local function IsBoss(mobName)
     return false
 end
 
---==================================================
--- FUNÇÃO PRINCIPAL: BRING (VERSÃO MELHORADA)
---==================================================
 BringEnemy = function()
     if not _B or not PosMon then return end
-
     local plr = game.Players.LocalPlayer
     local char = plr.Character
     local hrp = char and char:FindFirstChild("HumanoidRootPart")
     if not hrp then return end
-
-    -- Aumenta o raio de simulação para o jogo "aceitar" que você mova os mobs
     pcall(function() sethiddenproperty(plr, "SimulationRadius", math.huge) end)
-
     local count = 0
     for _, mob in pairs(workspace.Enemies:GetChildren()) do
         if count >= (_G.MaxBringMobs or 3) then break end
-        
         local hum = mob:FindFirstChild("Humanoid")
         local root = mob:FindFirstChild("HumanoidRootPart")
-
         if hum and root and hum.Health > 0 and not IsBoss(mob.Name) then
-            -- Verifica distância entre o mob e você (ou o ponto do farm)
             if (root.Position - hrp.Position).Magnitude <= (_G.BringRange or 235) then
                 count = count + 1
-                
-                -- 1. DESATIVA FÍSICA E ANIMAÇÕES (Igual ao segundo código)
                 root.CanCollide = false
                 root.AssemblyLinearVelocity = Vector3.zero
                 root.AssemblyAngularVelocity = Vector3.zero
-                
                 if hum:FindFirstChild("Animator") then
                     hum.Animator:Destroy()
                 end
-
-                -- 2. CRIA O BODY VELOCITY (Para o mob não cair/voar)
                 if not root:FindFirstChild("BodyVelocity") then
                     local bv = Instance.new("BodyVelocity")
                     bv.Name = "BodyVelocity"
@@ -756,24 +761,9 @@ BringEnemy = function()
                     bv.Velocity = Vector3.zero
                     bv.Parent = root
                 end
-
-                -- 3. CÁLCULO DE POSIÇÃO MÉDIA (Centro dos Mobs)
-                local avgPos = Vector3.zero
-                local totalSameMob = 0
-                for _, m in pairs(workspace.Enemies:GetChildren()) do
-                    if m.Name == mob.Name and m:FindFirstChild("HumanoidRootPart") then
-                        avgPos = avgPos + m.HumanoidRootPart.Position
-                        totalSameMob = totalSameMob + 1
-                    end
-                end
-                
-                local finalTarget = (totalSameMob > 0) and (avgPos / totalSameMob) or PosMon
-                local distToTarget = (root.Position - finalTarget).Magnitude
-
-                -- 4. TWEEN PARA O PONTO CENTRAL (Com velocidade controlada)
-                if distToTarget > 3 then
-                    local speed = _G.SpeedB or 100
-                    local tInfo = TweenInfo.new(distToTarget / speed, Enum.EasingStyle.Linear)
+                local distToTarget = (root.Position - PosMon).Magnitude
+                if distToTarget > 1 then
+                    local tInfo = TweenInfo.new(distToTarget / (_G.SpeedB or 500), Enum.EasingStyle.Linear)
                     TweenService:Create(root, tInfo, {CFrame = CFrame.new(PosMon)}):Play()
                 else
                     root.CFrame = CFrame.new(PosMon)
@@ -783,11 +773,8 @@ BringEnemy = function()
     end
 end
 
---==================================================
--- LOOP CONTROLADOR
---==================================================
 task.spawn(function()
-    while task.wait() do
+    while task.wait(0.1) do
         if FarmAtivo() and _G.BringMobsUser then
             _B = true
             BringEnemy()
