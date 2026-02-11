@@ -1,3 +1,4 @@
+
 if getgenv().Nousigi then 
 	if game.CoreGui:FindFirstChild("Night Mystic GUI") then
 		for i, v in ipairs(game.CoreGui:GetChildren()) do
@@ -12,12 +13,11 @@ getgenv().Nousigi = true
 local DisableAnimation = game.Players.LocalPlayer.PlayerGui:FindFirstChild('TouchGui')
 
 local T1UIColor = {
-local T1UIColor = {
     ["Border Color"] = Color3.fromRGB(50, 50, 50),
-    ["Click Effect Color"] = Color3.fromRGB(180, 40, 40),
+    ["Click Effect Color"] = Color3.fromRGB(200, 40, 40), -- Vermelho mais vivo no clique
     ["Setting Icon Color"] = Color3.fromRGB(200, 200, 200),
     ["Logo Image"] = "rbxassetid://105245380363493",
-    ["Search Icon Color"] = Color3.fromRGB(180, 40, 40),
+    ["Search Icon Color"] = Color3.fromRGB(200, 40, 40),
     ["Search Icon Highlight Color"] = Color3.fromRGB(255, 60, 60),
     ["GUI Text Color"] = Color3.fromRGB(240, 240, 240),
     ["Text Color"] = Color3.fromRGB(240, 240, 240),
@@ -25,38 +25,36 @@ local T1UIColor = {
     ["Title Text Color"] = Color3.fromRGB(255, 255, 255),
     
     -- Fundo Preto Fosco
-    ["Background Main Color"] = Color3.fromRGB(18, 18, 18), 
-    ["Background 1 Color"] = Color3.fromRGB(25, 25, 25),
-    ["Background 1 Transparency"] = 0.1,
-    ["Background 2 Color"] = Color3.fromRGB(35, 35, 35),
-    ["Background 3 Color"] = Color3.fromRGB(30, 30, 30),
+    ["Background Main Color"] = Color3.fromRGB(15, 15, 15), 
+    ["Background 1 Color"] = Color3.fromRGB(22, 22, 22),
+    ["Background 1 Transparency"] = 0.05, -- Quase opaco para o visual sólido
+    ["Background 2 Color"] = Color3.fromRGB(30, 30, 30),
+    ["Background 3 Color"] = Color3.fromRGB(25, 25, 25),
     ["Background Image"] = "",
     
-    -- Tabs e Destaques em Vermelho
-    ["Page Selected Color"] = Color3.fromRGB(180, 40, 40), -- Cor da Tab Selecionada
+    -- Destaques em Vermelho (Tabs e Toggles)
+    ["Page Selected Color"] = Color3.fromRGB(200, 40, 40), -- Cor da Tab Selecionada
     ["Section Text Color"] = Color3.fromRGB(255, 255, 255),
-    ["Section Underline Color"] = Color3.fromRGB(180, 40, 40), -- Linha da Tab/Seção
-    
-    -- Toggles
-    ["Toggle Border Color"] = Color3.fromRGB(60, 60, 60),
-    ["Toggle Checked Color"] = Color3.fromRGB(180, 40, 40), -- Cor dentro do Toggle quando ligado
+    ["Section Underline Color"] = Color3.fromRGB(200, 40, 40),
+    ["Toggle Border Color"] = Color3.fromRGB(70, 70, 70),
+    ["Toggle Checked Color"] = Color3.fromRGB(200, 40, 40), -- Cor interna do Toggle ligado
     ["Toggle Desc Color"] = Color3.fromRGB(180, 180, 180),
     
-    ["Button Color"] = Color3.fromRGB(40, 40, 40),
-    ["Label Color"] = Color3.fromRGB(30, 30, 30),
-    ["Dropdown Icon Color"] = Color3.fromRGB(180, 40, 40),
-    ["Dropdown Selected Color"] = Color3.fromRGB(180, 40, 40),
+    ["Button Color"] = Color3.fromRGB(35, 35, 35),
+    ["Label Color"] = Color3.fromRGB(28, 28, 28),
+    ["Dropdown Icon Color"] = Color3.fromRGB(200, 40, 40),
+    ["Dropdown Selected Color"] = Color3.fromRGB(200, 40, 40),
     ["Dropdown Selected Check Color"] = Color3.fromRGB(255, 255, 255),
     
-    ["Textbox Highlight Color"] = Color3.fromRGB(180, 40, 40),
-    ["Box Highlight Color"] = Color3.fromRGB(180, 40, 40),
+    ["Textbox Highlight Color"] = Color3.fromRGB(200, 40, 40),
+    ["Box Highlight Color"] = Color3.fromRGB(200, 40, 40),
     ["Slider Line Color"] = Color3.fromRGB(45, 45, 45),
-    ["Slider Highlight Color"] = Color3.fromRGB(180, 40, 40),
+    ["Slider Highlight Color"] = Color3.fromRGB(200, 40, 40),
     
     ["Tween Animation 1 Speed"] = DisableAnimation and 0 or 0.25,
     ["Tween Animation 2 Speed"] = DisableAnimation and 0 or 0.5,
     ["Tween Animation 3 Speed"] = DisableAnimation and 0 or 0.1,
-    ["Text Stroke Transparency"] = .8
+    ["Text Stroke Transparency"] = .8 
 }
 
 
