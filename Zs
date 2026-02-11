@@ -1,3 +1,4 @@
+-- Darkness Best Script  I am from Brazil 🇧🇷 and this is not a copy of any other hub
 
 local Services = setmetatable({}, {
     __index = function(self, serviceName)
@@ -6,46 +7,6 @@ local Services = setmetatable({}, {
         return service
     end
 })
-
-
-local HttpService = Services.HttpService
-local FolderName = "Darkness"
-local FileName = "Settings.json"
-local FullPath = FolderName .. "/" .. FileName
-
-if makefolder and not isfolder(FolderName) then 
-    makefolder(FolderName) 
-end
-
-_G.SaveData = _G.SaveData or {}
-
-function SaveSettings()
-    if not writefile then return false end
-    local success = pcall(function()
-        local json = HttpService:JSONEncode(_G.SaveData)
-        writefile(FullPath, json)
-    end)
-    return success
-end
-
-function LoadSettings()
-    if not (isfile and isfile(FullPath)) then return false end
-    local success, result = pcall(function()
-        local content = readfile(FullPath)
-        return HttpService:JSONDecode(content)
-    end)
-    if success and result then 
-        _G.SaveData = result
-        return true
-    end
-    return false
-end
-
-function GetSetting(name, default)
-    return _G.SaveData[name] ~= nil and _G.SaveData[name] or default
-end
-
-LoadSettings()
 
 
 local Players = Services.Players
@@ -73,14 +34,6 @@ task.spawn(function()
     end
 end)
 
-
-local desiredTeam = "Marines"
-
-if not player.Team or player.Team.Name ~= desiredTeam then
-    pcall(function()
-        ReplicatedStorage.Remotes.CommF_:InvokeServer("SetTeam", desiredTeam)
-    end)
-end
 
 local Lighting = Services.Lighting
 
@@ -375,18 +328,26 @@ G.DistH = function(I, e)
 _G.MobHeight = _G.MobHeight or 20
 
 G.Kill = function(I, e)
-	if not (I and e) then return end
+    if not (I and e) then 
+        _B = false -- Desativa se não houver alvo
+        return 
+    end
 
-	local hrp = I:FindFirstChild("HumanoidRootPart")
-	if not hrp then return end
+    local hrp = I:FindFirstChild("HumanoidRootPart")
+    if not hrp then return end
 
-	-- trava posição do mob
-	if not I:GetAttribute("Locked") then
-		I:SetAttribute("Locked", hrp.CFrame)
-	end
+    -- Trava a posição do mob para referência do agrupamento
+    if not I:GetAttribute("Locked") then
+        I:SetAttribute("Locked", hrp.CFrame)
+    end
 
-	-- posição alvo do bring
-	PosMon = (I:GetAttribute("Locked")).Position
+    -- Define onde os outros mobs devem ser puxados e liga o Bring
+    PosMon = (I:GetAttribute("Locked")).Position
+    _B = true
+    
+    -- O restante do seu código de ataque/Skills viria aqui embaixo
+end
+
 
 	-- >>> FORÇA O BRING <<<
 	_B = true
@@ -561,7 +522,6 @@ statsSetings = function(I, e)
 	end;
 
 
-
 _G = _G or {}
 _B = false
 PosMon = nil
@@ -629,6 +589,7 @@ task.spawn(function()
         end
     end
 end)
+
 
 
 Useskills = function(I, e)
@@ -3724,13 +3685,13 @@ Setting:AddButton({
             
             -- Notificação Universal
             game.StarterGui:SetCore("SendNotification", {
-                Title = "Darknnes Hub",
+                Title = "Darkness Hub",
                 Text = "Done",
                 Duration = 5
             })
         else
             game.StarterGui:SetCore("SendNotification", {
-                Title = "Darknnes Hub",
+                Title = "Darkness Hub",
                 Text = "Nil",
                 Duration = 3
             })
@@ -9866,3 +9827,43 @@ FastAttackModule.FastAttack = FastAttack
 
 
 return FastAttackModulem
+
+
+local HttpService = Services.HttpService
+local FolderName = "Darkness"
+local FileName = "Settings.json"
+local FullPath = FolderName .. "/" .. FileName
+
+if makefolder and not isfolder(FolderName) then 
+    makefolder(FolderName) 
+end
+
+_G.SaveData = _G.SaveData or {}
+
+function SaveSettings()
+    if not writefile then return false end
+    local success = pcall(function()
+        local json = HttpService:JSONEncode(_G.SaveData)
+        writefile(FullPath, json)
+    end)
+    return success
+end
+
+function LoadSettings()
+    if not (isfile and isfile(FullPath)) then return false end
+    local success, result = pcall(function()
+        local content = readfile(FullPath)
+        return HttpService:JSONDecode(content)
+    end)
+    if success and result then 
+        _G.SaveData = result
+        return true
+    end
+    return false
+end
+
+function GetSetting(name, default)
+    return _G.SaveData[name] ~= nil and _G.SaveData[name] or default
+end
+
+LoadSettings()
