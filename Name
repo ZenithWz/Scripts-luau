@@ -1189,93 +1189,94 @@ Hop = function()
 			end;
 		end);
 	end;
-local C = Instance.new("Part", workspace)
-C.Size = Vector3.new(1, 1, 1)
-C.Name = "Rip_Indra"
-C.Anchored = true
-C.CanCollide = false
-C.CanTouch = false
-C.Transparency = 1
+local Players = game:GetService("Players")
+local TweenService = game:GetService("TweenService")
+local LocalPlayer = Players.LocalPlayer
 
-local M = workspace:FindFirstChild(C.Name)
-if M and M ~= C then
-    M:Destroy()
+getgenv().distance = 350
+getgenv().BypassTp = true
+getgenv().NOCLIP = true
+
+function TP(TargetCFrame)
+    local Character = LocalPlayer.Character
+    if not Character or not Character:FindFirstChild("HumanoidRootPart") then return end
+
+    local HumanoidRootPart = Character.HumanoidRootPart
+    local Humanoid = Character:FindFirstChild("Humanoid")
+    local Distance = (TargetCFrame.Position - HumanoidRootPart.Position).Magnitude
+
+    if Distance <= getgenv().distance then
+        HumanoidRootPart.CFrame = TargetCFrame
+        return
+    end
+
+    local TweenSpeed = Distance / 300
+    local TweenInfoData = TweenInfo.new(TweenSpeed, Enum.EasingStyle.Linear)
+    local Tween = TweenService:Create(HumanoidRootPart, TweenInfoData, {CFrame = TargetCFrame})
+
+    HumanoidRootPart.CFrame = CFrame.new(HumanoidRootPart.CFrame.X, TargetCFrame.Position.Y, HumanoidRootPart.CFrame.Z)
+
+    if getgenv().BypassTp and Distance >= 3000 then
+        HumanoidRootPart.CFrame = TargetCFrame
+        task.wait()
+        HumanoidRootPart.CFrame = TargetCFrame
+        if game:GetService("ReplicatedStorage"):FindFirstChild("Remotes") and game:GetService("ReplicatedStorage").Remotes:FindFirstChild("CommF_") then
+            game:GetService("ReplicatedStorage").Remotes.CommF_:InvokeServer("SetSpawnPoint")
+        end
+    end
+
+    Tween:Play()
+end
+
+function StopTween()
+    local Character = LocalPlayer.Character
+    if Character and Character:FindFirstChild("HumanoidRootPart") then
+        local HRP = Character.HumanoidRootPart
+        if HRP:FindFirstChild("BodyClip") then
+            HRP.BodyClip:Destroy()
+        end
+        local Tween = TweenService:Create(HRP, TweenInfo.new(0), {CFrame = HRP.CFrame})
+        Tween:Play()
+    end
+end
+
+getgenv()._tp = TP
+getgenv().TeleportToTarget = TP
+getgenv().notween = function(TargetCFrame)
+    if LocalPlayer.Character and LocalPlayer.Character:FindFirstChild("HumanoidRootPart") then
+        LocalPlayer.Character.HumanoidRootPart.CFrame = TargetCFrame
+    end
 end
 
 task.spawn(function()
     while task.wait() do
-        if C and C.Parent == workspace then
-            getgenv().OnFarm = shouldTween or false
-        else
-            getgenv().OnFarm = false
-        end
-    end
-end)
-
-task.spawn(function()
-    local I = game.Players.LocalPlayer
-    repeat task.wait() until I.Character and I.Character.PrimaryPart
-    C.CFrame = I.Character.PrimaryPart.CFrame
-    while task.wait() do
         pcall(function()
-            if getgenv().OnFarm then
-                if C and C.Parent == workspace then
-                    local e = I.Character and I.Character.PrimaryPart
-                    if e and (e.Position - C.Position).Magnitude <= 200 then
-                        e.CFrame = C.CFrame
-                    else
-                        C.CFrame = e.CFrame
+            if getgenv().NOCLIP then
+                local Character = LocalPlayer.Character
+                if Character and Character:FindFirstChild("HumanoidRootPart") then
+                    if not Character.HumanoidRootPart:FindFirstChild("BodyClip") then
+                        local BV = Instance.new("BodyVelocity")
+                        BV.Name = "BodyClip"
+                        BV.Parent = Character.HumanoidRootPart
+                        BV.MaxForce = Vector3.new(100000, 100000, 100000)
+                        BV.Velocity = Vector3.new(0, 0, 0)
                     end
-                end
-                if I.Character then
-                    for _, v in pairs(I.Character:GetChildren()) do
-                        if v:IsA("BasePart") then v.CanCollide = false end
+                    
+                    for _, v in pairs(Character:GetDescendants()) do
+                        if v:IsA("BasePart") then
+                            v.CanCollide = false
+                        end
                     end
                 end
             else
-                if I.Character then
-                    for _, v in pairs(I.Character:GetChildren()) do
-                        if v:IsA("BasePart") then v.CanCollide = true end
-                    end
+                local Character = LocalPlayer.Character
+                if Character and Character:FindFirstChild("HumanoidRootPart") and Character.HumanoidRootPart:FindFirstChild("BodyClip") then
+                    Character.HumanoidRootPart.BodyClip:Destroy()
                 end
             end
         end)
     end
 end)
-
-function TP(p35)
-    local plr = game.Players.LocalPlayer
-    if not plr.Character or not plr.Character:FindFirstChild("HumanoidRootPart") then return end
-    local root = plr.Character.HumanoidRootPart
-    local v36 = (p35.Position - root.Position).Magnitude
-    
-    if _G.distance and v36 <= _G.distance then
-        root.CFrame = p35
-        return
-    end
-
-    shouldTween = true
-    getgenv().OnFarm = false
-
-    local v37 = TweenInfo.new(v36 / 350, Enum.EasingStyle.Linear)
-    local v38 = game:GetService("TweenService"):Create(root, v37, {["CFrame"] = p35})
-    
-    root.CFrame = CFrame.new(root.CFrame.X, p35.Position.Y, root.CFrame.Z)
-    v38:Play()
-
-    v38.Completed:Connect(function()
-        shouldTween = false
-        getgenv().OnFarm = true
-    end)
-end
-
-_tp = TP
-TeleportToTarget = TP
-notween = function(I)
-    if game.Players.LocalPlayer.Character and game.Players.LocalPlayer.Character:FindFirstChild("HumanoidRootPart") then
-        game.Players.LocalPlayer.Character.HumanoidRootPart.CFrame = I
-    end
-end
 
 
 
