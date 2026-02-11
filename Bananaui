@@ -12,8 +12,9 @@ getgenv().Nousigi = true
 local DisableAnimation = game.Players.LocalPlayer.PlayerGui:FindFirstChild('TouchGui')
 
 local T1UIColor = {
+local T1UIColor = {
     ["Border Color"] = Color3.fromRGB(50, 50, 50),
-    ["Click Effect Color"] = Color3.fromRGB(180, 40, 40), -- Vermelho fosco no clique
+    ["Click Effect Color"] = Color3.fromRGB(180, 40, 40),
     ["Setting Icon Color"] = Color3.fromRGB(200, 200, 200),
     ["Logo Image"] = "rbxassetid://105245380363493",
     ["Search Icon Color"] = Color3.fromRGB(180, 40, 40),
@@ -26,17 +27,19 @@ local T1UIColor = {
     -- Fundo Preto Fosco
     ["Background Main Color"] = Color3.fromRGB(18, 18, 18), 
     ["Background 1 Color"] = Color3.fromRGB(25, 25, 25),
-    ["Background 1 Transparency"] = 0.1, -- Menos transparência para parecer mais sólido/fosco
+    ["Background 1 Transparency"] = 0.1,
     ["Background 2 Color"] = Color3.fromRGB(35, 35, 35),
     ["Background 3 Color"] = Color3.fromRGB(30, 30, 30),
     ["Background Image"] = "",
     
-    -- Destaques em Vermelho Fosco
-    ["Page Selected Color"] = Color3.fromRGB(180, 40, 40),
+    -- Tabs e Destaques em Vermelho
+    ["Page Selected Color"] = Color3.fromRGB(180, 40, 40), -- Cor da Tab Selecionada
     ["Section Text Color"] = Color3.fromRGB(255, 255, 255),
-    ["Section Underline Color"] = Color3.fromRGB(180, 40, 40),
+    ["Section Underline Color"] = Color3.fromRGB(180, 40, 40), -- Linha da Tab/Seção
+    
+    -- Toggles
     ["Toggle Border Color"] = Color3.fromRGB(60, 60, 60),
-    ["Toggle Checked Color"] = Color3.fromRGB(180, 40, 40),
+    ["Toggle Checked Color"] = Color3.fromRGB(180, 40, 40), -- Cor dentro do Toggle quando ligado
     ["Toggle Desc Color"] = Color3.fromRGB(180, 180, 180),
     
     ["Button Color"] = Color3.fromRGB(40, 40, 40),
@@ -53,8 +56,9 @@ local T1UIColor = {
     ["Tween Animation 1 Speed"] = DisableAnimation and 0 or 0.25,
     ["Tween Animation 2 Speed"] = DisableAnimation and 0 or 0.5,
     ["Tween Animation 3 Speed"] = DisableAnimation and 0 or 0.1,
-    ["Text Stroke Transparency"] = .8 -- Stroke mais suave para o visual fosco
+    ["Text Stroke Transparency"] = .8
 }
+
 
 
 getgenv().UIColor = T1UIColor
