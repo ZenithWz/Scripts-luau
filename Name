@@ -1189,94 +1189,147 @@ Hop = function()
 			end;
 		end);
 	end;
-local Players = game:GetService("Players")
 local TweenService = game:GetService("TweenService")
+local Players = game:GetService("Players")
 local LocalPlayer = Players.LocalPlayer
 
-getgenv().distance = 350
-getgenv().BypassTp = true
-getgenv().NOCLIP = true
+-- Configurações Globais
+_G.distance = 250 
+_G.BypassTp = false
+getgenv().TweenSpeedFar = 300
+getgenv().IsTweening = false -- Variável de controle vital
 
-function TP(TargetCFrame)
+local currentTween = nil -- Armazena o tween atual para cancelá-lo
+
+-- =======================
+-- FUNÇÃO DE TELEPORTE (TP)
+-- =======================
+local function TP(TargetCFrame)
     local Character = LocalPlayer.Character
     if not Character or not Character:FindFirstChild("HumanoidRootPart") then return end
-
-    local HumanoidRootPart = Character.HumanoidRootPart
-    local Humanoid = Character:FindFirstChild("Humanoid")
-    local Distance = (TargetCFrame.Position - HumanoidRootPart.Position).Magnitude
-
-    if Distance <= getgenv().distance then
-        HumanoidRootPart.CFrame = TargetCFrame
+    
+    local HRP = Character.HumanoidRootPart
+    local dist = (TargetCFrame.Position - HRP.Position).Magnitude
+    
+    -- Se já houver um tween rodando, cancela ele antes de começar outro
+    if currentTween then currentTween:Cancel() end
+    
+    -- Se estiver perto, teleporte instantâneo e para
+    if dist <= _G.distance then
+        HRP.CFrame = TargetCFrame
+        getgenv().IsTweening = false
         return
     end
+    
+    getgenv().IsTweening = true -- Ativa o modo de voo/noclip
 
-    local TweenSpeed = Distance / 300
-    local TweenInfoData = TweenInfo.new(TweenSpeed, Enum.EasingStyle.Linear)
-    local Tween = TweenService:Create(HumanoidRootPart, TweenInfoData, {CFrame = TargetCFrame})
-
-    HumanoidRootPart.CFrame = CFrame.new(HumanoidRootPart.CFrame.X, TargetCFrame.Position.Y, HumanoidRootPart.CFrame.Z)
-
-    if getgenv().BypassTp and Distance >= 3000 then
-        HumanoidRootPart.CFrame = TargetCFrame
-        task.wait()
-        HumanoidRootPart.CFrame = TargetCFrame
-        if game:GetService("ReplicatedStorage"):FindFirstChild("Remotes") and game:GetService("ReplicatedStorage").Remotes:FindFirstChild("CommF_") then
-            game:GetService("ReplicatedStorage").Remotes.CommF_:InvokeServer("SetSpawnPoint")
-        end
+    -- Configuração do Tween
+    local tweenTime = dist / getgenv().TweenSpeedFar
+    local tweenInfo = TweenInfo.new(tweenTime, Enum.EasingStyle.Linear)
+    
+    currentTween = TweenService:Create(HRP, tweenInfo, { ["CFrame"] = TargetCFrame })
+    
+    -- Ajuste de altura inicial apenas se estiver longe
+    if dist > 50 then
+        HRP.CFrame = CFrame.new(HRP.CFrame.X, TargetCFrame.Position.Y, HRP.CFrame.Z)
     end
+    
+    -- Lógica de Bypass
+    if _G.BypassTp and dist >= 3000 then
+        if Character:FindFirstChild("Humanoid") then
+            Character.Humanoid:ChangeState(Enum.HumanoidStateType.Dead)
+        end
+        HRP.CFrame = TargetCFrame
+        task.wait()
+        HRP.CFrame = TargetCFrame
+    end
+    
+    currentTween:Play()
 
-    Tween:Play()
+    -- Detecta quando o tween acaba sozinho
+    currentTween.Completed:Connect(function()
+        getgenv().IsTweening = false
+    end)
 end
 
-function StopTween()
+-- =======================
+-- FUNÇÃO STOP TWEEN (CORRIGIDA)
+-- =======================
+local function StopTween()
+    getgenv().IsTweening = false -- Desliga o suporte de voo
+    if currentTween then 
+        currentTween:Cancel() -- Para o movimento imediatamente
+    end
+    
     local Character = LocalPlayer.Character
-    if Character and Character:FindFirstChild("HumanoidRootPart") then
-        local HRP = Character.HumanoidRootPart
-        if HRP:FindFirstChild("BodyClip") then
+    if Character then
+        local HRP = Character:FindFirstChild("HumanoidRootPart")
+        local Humanoid = Character:FindFirstChild("Humanoid")
+        
+        -- Remove o BodyVelocity para você não ficar travado no ar
+        if HRP and HRP:FindFirstChild("BodyClip") then
             HRP.BodyClip:Destroy()
         end
-        local Tween = TweenService:Create(HRP, TweenInfo.new(0), {CFrame = HRP.CFrame})
-        Tween:Play()
+        
+        -- Devolve a física ao Humanoid
+        if Humanoid then
+            Humanoid:ChangeState(Enum.HumanoidStateType.GettingUp)
+        end
     end
 end
 
-getgenv()._tp = TP
-getgenv().TeleportToTarget = TP
-getgenv().notween = function(TargetCFrame)
-    if LocalPlayer.Character and LocalPlayer.Character:FindFirstChild("HumanoidRootPart") then
-        LocalPlayer.Character.HumanoidRootPart.CFrame = TargetCFrame
-    end
-end
-
+-- =======================
+-- LOOP DE SUPORTE (DINÂMICO)
+-- =======================
 task.spawn(function()
-    while task.wait() do
+    while true do
+        task.wait()
         pcall(function()
-            if getgenv().NOCLIP then
-                local Character = LocalPlayer.Character
-                if Character and Character:FindFirstChild("HumanoidRootPart") then
-                    if not Character.HumanoidRootPart:FindFirstChild("BodyClip") then
-                        local BV = Instance.new("BodyVelocity")
-                        BV.Name = "BodyClip"
-                        BV.Parent = Character.HumanoidRootPart
-                        BV.MaxForce = Vector3.new(100000, 100000, 100000)
-                        BV.Velocity = Vector3.new(0, 0, 0)
+            local Character = LocalPlayer.Character
+            if Character and Character:FindFirstChild("HumanoidRootPart") then
+                local HRP = Character.HumanoidRootPart
+                
+                -- SÓ APLICA NOCLIP E VELOCITY SE ESTIVER TWEENANDO
+                if getgenv().IsTweening then
+                    -- Cria ou mantém o BodyVelocity (para não cair)
+                    local bv = HRP:FindFirstChild("BodyClip")
+                    if not bv then
+                        bv = Instance.new("BodyVelocity")
+                        bv.Name = "BodyClip"
+                        bv.Parent = HRP
+                        bv.MaxForce = Vector3.new(math.huge, math.huge, math.huge)
                     end
+                    bv.Velocity = Vector3.new(0, 0, 0)
                     
+                    -- Noclip (desativa colisão)
                     for _, v in pairs(Character:GetDescendants()) do
                         if v:IsA("BasePart") then
                             v.CanCollide = false
                         end
                     end
-                end
-            else
-                local Character = LocalPlayer.Character
-                if Character and Character:FindFirstChild("HumanoidRootPart") and Character.HumanoidRootPart:FindFirstChild("BodyClip") then
-                    Character.HumanoidRootPart.BodyClip:Destroy()
+                else
+                    -- SE NÃO ESTIVER TWEENANDO: Limpa e devolve a colisão
+                    if HRP:FindFirstChild("BodyClip") then
+                        HRP.BodyClip:Destroy()
+                    end
+                    -- Reativa colisão básica para não atravessar o chão
+                    if Character:FindFirstChild("UpperTorso") then
+                         Character.UpperTorso.CanCollide = true
+                    elseif Character:FindFirstChild("Torso") then
+                         Character.Torso.CanCollide = true
+                    end
+                    HRP.CanCollide = true
                 end
             end
         end)
     end
 end)
+
+-- Interceptadores Globais
+getgenv()._tp = TP
+getgenv().TeleportToTarget = TP
+getgenv().notween = TP
+getgenv().StopTween = StopTween
 
 
 
