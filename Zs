@@ -210,7 +210,9 @@ function I:NewWindow(config)
                 if Section.AddSeperator then
                     Section:AddSeperator(text)
                 else
-                    Section:AddLabel("<font color='rgb(255, 200, 0)'>" .. (text or "") .. "</font>")
+                    Section:AddLabel("<font color='rgb(255, 200, 0)'>--- " .. (text or "") .. " ---</font>")
+                end
+            end
 
             function SectionWrapper:AddDiscord(title, link)
                 Section:AddButton({
