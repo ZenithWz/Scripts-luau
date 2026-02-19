@@ -697,6 +697,8 @@ _G.MaxBringMobs = _G.MaxBringMobs or 3
 _G.SpeedB = _G.SpeedB or 190 
 _G.CanBringCycle = true
 
+local player = game.Players.LocalPlayer
+
 local function FarmAtivo()
     if _G.FarmMastery_S or _G.FarmMastery_G or _G.FarmMastery_Dev then
         return true
@@ -742,86 +744,124 @@ local function IsBoss(mobName)
     return false
 end
 
-local function ReleaseEnemies()
-    for _, mob in pairs(workspace.Enemies:GetChildren()) do
-        local root = mob:FindFirstChild("HumanoidRootPart")
-        if root then
-            if root:FindFirstChild("BodyVelocity") then
-                root.BodyVelocity:Destroy()
-            end
-            if root:FindFirstChild("BodyPosition") then
-                root.BodyPosition:Destroy()
-            end
-            root.CanCollide = true
-        end
-    end
-end
-
 BringEnemy = function()
-    if not _G.BringMobsUser or not PosMon then return end
-    local plr = game.Players.LocalPlayer
-    local char = plr.Character
+    if not _B or not PosMon then return end
+
+    local char = player.Character
     local hrp = char and char:FindFirstChild("HumanoidRootPart")
     if not hrp then return end
-    
-    pcall(function() sethiddenproperty(plr, "SimulationRadius", math.huge) end)
-    
+
+    local BringRange = _G.BringRange
+    local MaxMob = _G.MobM
     local count = 0
-    for _, mob in pairs(workspace.Enemies:GetChildren()) do
-        if count >= (_G.MaxBringMobs or 4) then break end
-        local hum = mob:FindFirstChild("Humanoid")
-        local root = mob:FindFirstChild("HumanoidRootPart")
-        
-        if hum and root and hum.Health > 0 and not IsBoss(mob.Name) then
-            if (root.Position - hrp.Position).Magnitude <= (_G.BringRange or 300) then
-                count = count + 1
-                root.CanCollide = false
-                root.AssemblyLinearVelocity = Vector3.zero
-                root.AssemblyAngularVelocity = Vector3.zero
-                
-                if hum:FindFirstChild("Animator") then
-                    hum.Animator:Destroy()
-                end
-                
-                local bv = root:FindFirstChild("BodyVelocity") or Instance.new("BodyVelocity")
-                bv.Name = "BodyVelocity"
-                bv.Velocity = Vector3.zero
-                bv.MaxForce = Vector3.new(math.huge, math.huge, math.huge)
-                if bv.Parent ~= root then bv.Parent = root end
-                
-                local bp = root:FindFirstChild("BodyPosition") or Instance.new("BodyPosition")
-                bp.Name = "BodyPosition"
-                bp.Position = PosMon
-                bp.P = 30000
-                bp.D = 3000
-                bp.MaxForce = Vector3.new(math.huge, math.huge, math.huge)
-                if bp.Parent ~= root then bp.Parent = root end
-                
-                if (root.Position - PosMon).Magnitude <= 70 then
-                    root.CFrame = CFrame.new(PosMon)
-                else
-                    bp.Position = PosMon
-                end
+
+    for _, enemy in pairs(workspace.Enemies:GetChildren()) do
+        if count >= MaxMob then break end
+
+        if IsRaidMob and IsRaidMob(enemy) then continue end
+
+        local isBoss = false
+        for _, b in ipairs(BossList or {}) do
+            if enemy.Name == b then
+                isBoss = true
+                break
             end
         end
+        if isBoss then continue end
+
+        local hum = enemy:FindFirstChild("Humanoid")
+        local root = enemy:FindFirstChild("HumanoidRootPart")
+        if not hum or not root or hum.Health <= 0 then continue end
+
+        if (root.Position - PosMon).Magnitude > BringRange then continue end
+
+        count += 1
+
+        local fixedPos = Vector3.new(PosMon.X, root.Position.Y, PosMon.Z)
+        root.CFrame = CFrame.new(fixedPos)
+
+        root.CanCollide = false
+        root.AssemblyLinearVelocity = Vector3.zero
+        root.AssemblyAngularVelocity = Vector3.zero
+
+        hum:ChangeState(Enum.HumanoidStateType.Physics)
+
+        if root:FindFirstChild("BodyVelocity") then
+            root.BodyVelocity:Destroy()
+        end
+
+        if not root:FindFirstChild("BodyPosition") then
+            local bp = Instance.new("BodyPosition")
+            bp.Name = "BodyPosition"
+            bp.MaxForce = Vector3.new(1e9, 0, 1e9)
+            bp.Position = fixedPos
+            bp.D = 1000
+            bp.P = 20000
+            bp.Parent = root
+        else
+            root.BodyPosition.Position = fixedPos
+        end
+
+        pcall(function()
+            sethiddenproperty(player, "SimulationRadius", math.huge)
+        end)
     end
 end
 
 task.spawn(function()
     while true do
-        if _G.CanBringCycle then
-            _G.BringMobsUser = true
-            local start = tick()
-            while tick() - start < 3 do
-                BringEnemy()
-                task.wait()
+        task.wait()
+        pcall(function()
+            if setscriptable then
+                setscriptable(player, "SimulationRadius", true)
             end
-            _G.BringMobsUser = false
-            ReleaseEnemies()
-            task.wait(5)
-        else
-            task.wait(1)
-        end
+            if sethiddenproperty then
+                sethiddenproperty(player, "SimulationRadius", math.huge)
+            end
+        end)
+    end
+end)
+
+task.spawn(function()
+    while task.wait() do
+        pcall(function()
+            _B = FarmAtivo() and Settings.BringEnemy
+            if _B then
+                BringEnemy()
+            end
+        end)
+    end
+end)
+
+task.spawn(function()
+    while task.wait(0.3) do
+        pcall(function()
+            if Settings.AutoFarm and Settings.BringEnemy then
+                local char = player.Character
+                if not char then return end
+
+                local hrp = char:FindFirstChild("HumanoidRootPart")
+                if not hrp then return end
+
+                if not hrp:FindFirstChild("Stabilizer") then
+                    local bv = Instance.new("BodyVelocity")
+                    bv.Name = "Stabilizer"
+                    bv.MaxForce = Vector3.new(0, 1e6, 0)
+                    bv.Velocity = Vector3.new(0, 0.1, 0)
+                    bv.Parent = hrp
+                end
+            else
+                local char = player.Character
+                if not char then return end
+
+                local hrp = char:FindFirstChild("HumanoidRootPart")
+                if not hrp then return end
+
+                if hrp:FindFirstChild("Stabilizer") then
+                    hrp.Stabilizer:Destroy()
+                end
+            end
+        end)
     end
 end)
 
