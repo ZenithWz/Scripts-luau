@@ -6052,6 +6052,15 @@ T:AddToggle({
 })
 
 T:AddToggle({
+    Title = "Bypass Teleport (Reset)",
+    Default = _G.Bypass or false,
+    Callback = function(v)
+        _G.Bypass = v
+    end
+})
+
+
+T:AddToggle({
 	Title = "Safe Mode",
 	Description = "turn on for safe ur health if low",
 	Default = GetSetting("SafeMode_Save", false),
