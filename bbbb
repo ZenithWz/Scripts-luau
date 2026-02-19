@@ -1180,6 +1180,11 @@ Hop = function()
 		end);
 	end;
 
+local Players = game:GetService("Players")
+local LP = Players.LocalPlayer
+local RS = game:GetService("ReplicatedStorage")
+local TS = game:GetService("TweenService")
+
 local C = Instance.new("Part", workspace)
 C.Size = Vector3.new(1, 1, 1)
 C.Name = "Rip_Indra"
@@ -1193,6 +1198,12 @@ if M and M ~= C then
 	M:Destroy()
 end
 
+getgenv().PMT_MAX_STEP_DIST = getgenv().PMT_MAX_STEP_DIST or 9000
+getgenv().PMT_HOLD_TIME = getgenv().PMT_HOLD_TIME or 2
+getgenv().PMT_HOLD_STEP = getgenv().PMT_HOLD_STEP or 0.03
+getgenv().PMT_RESPAWN_TIMEOUT = getgenv().PMT_RESPAWN_TIMEOUT or 7
+getgenv().PMT_SKIP_IF_NEAR = getgenv().PMT_SKIP_IF_NEAR or 2000
+
 getgenv().PMT_DATA = {
 	Islands = {
 		["WindMill"] = CFrame.new(979.799, 16.516, 1429.047), ["Marine"] = CFrame.new(-2566.43, 6.856, 2045.256), ["Middle Town"] = CFrame.new(-690.331, 15.094, 1582.238), ["Jungle"] = CFrame.new(-1612.796, 36.852, 149.128), ["Pirate Village"] = CFrame.new(-1181.309, 4.751, 3803.546), ["Desert"] = CFrame.new(944.158, 20.92, 4373.3), ["Snow Island"] = CFrame.new(1347.807, 104.668, -1319.737), ["MarineFord"] = CFrame.new(-4914.821, 50.964, 4281.028), ["Colosseum"] = CFrame.new(-1427.62, 7.288, -2792.772), ["Sky Island 1"] = CFrame.new(-4869.103, 733.461, -2667.018), ["Sky Island 2"] = CFrame.new(-11.311, 29.277, 2771.522), ["Sky Island 3"] = CFrame.new(-483.734, 332.038, 595.327), ["Prison"] = CFrame.new(4875.33, 5.652, 734.85), ["Magma Village"] = CFrame.new(-5247.716, 12.884, 8504.969), ["Under Water Island"] = CFrame.new(61163.852, 11.68, 1819.784), ["Fountain City"] = CFrame.new(5127.128, 59.501, 4105.446), ["The Cafe"] = CFrame.new(-380.479, 77.22, 255.826), ["Frist Spot"] = CFrame.new(-9515.372, 164.006, 5786.061), ["Dark Area"] = CFrame.new(3780.03, 22.652, -3498.586), ["Flamingo Mansion"] = CFrame.new(-3032.764, 317.897, -10075.373), ["Flamingo Room"] = CFrame.new(2284.414, 15.152, 875.725), ["Green Zone"] = CFrame.new(-2448.53, 73.016, -3210.631), ["Factory"] = CFrame.new(424.127, 211.162, -427.54), ["Colossuim"] = CFrame.new(-1503.622, 219.796, 1369.31), ["Zombie Island"] = CFrame.new(-5622.033, 492.196, -781.786), ["Two Snow Mountain"] = CFrame.new(753.143, 408.236, -5274.615), ["Punk Hazard"] = CFrame.new(-6127.654, 15.952, -5040.286), ["Cursed Ship"] = CFrame.new(923.402, 125.057, 32885.875), ["Ice Castle"] = CFrame.new(6148.412, 294.387, -6741.117), ["Forgotten Island"] = CFrame.new(2681.274, 1682.809, -7190.985), ["Sea castle"] = CFrame.new(-5496.452, 313.809, -2857.703), ["Mini Sky Island"] = CFrame.new(-288.741, 49326.316, -35248.594), ["Great Tree"] = CFrame.new(2681.274, 1682.809, -7190.985), ["Port Town"] = CFrame.new(-226.751, 20.603, 5538.34), ["Hydra Island"] = CFrame.new(5291.249, 1005.443, 393.762), ["Mansion"] = CFrame.new(-12633.672, 459.521, -7425.463), ["Haunted Castle"] = CFrame.new(-9366.803, 141.366, 5443.941), ["Ice Cream Island"] = CFrame.new(-902.568, 79.932, -10988.848), ["Peanut Island"] = CFrame.new(-2062.748, 50.474, -10232.568), ["Cake Island"] = CFrame.new(-1884.775, 19.328, -11666.897), ["Cocoa Island"] = CFrame.new(87.943, 73.555, -12319.465), ["Candy Island"] = CFrame.new(-1014.424, 149.111, -14555.963), ["Tiki Outpost"] = CFrame.new(-16218.683, 9.086, 445.618), ["Dragon Dojo"] = CFrame.new(5743.319, 1206.91, 936.011)
@@ -1204,9 +1215,56 @@ getgenv().PMT_DATA = {
 	}
 }
 
+local Alias = {
+	["MiniSky"] = "Mini Sky Island",
+}
+
+local function getWorldKey()
+	if World1 then return "World1" end
+	if World2 then return "World2" end
+	if World3 then return "World3" end
+	return "World1"
+end
+
+local function normName(name)
+	if type(name) ~= "string" then return nil end
+	name = name:gsub("^%s+", ""):gsub("%s+$", "")
+	if Alias[name] then name = Alias[name] end
+	return name
+end
+
+local function dist(a, b) return (a - b).Magnitude end
+
+local function GetChar()
+	local c = LP.Character or LP.CharacterAdded:Wait()
+	local hrp = c:WaitForChild("HumanoidRootPart", 10)
+	local hum = c:FindFirstChildOfClass("Humanoid")
+	if not (hrp and hum) then return end
+	return c, hrp, hum
+end
+
+local function buildNodes()
+	local wk = getWorldKey()
+	local list = getgenv().PMT_DATA.Worlds[wk] or {}
+	local nodes = {}
+	for _, n in ipairs(list) do
+		if getgenv().PMT_DATA.Islands[n] then nodes[#nodes+1] = n end
+	end
+	return nodes
+end
+
+local function nearestIsland(pos, nodes)
+	local best, bestD
+	for _, n in ipairs(nodes) do
+		local d = dist(pos, getgenv().PMT_DATA.Islands[n].Position)
+		if not bestD or d < bestD then bestD, best = d, n end
+	end
+	return best, bestD or math.huge
+end
+
 function CheckNearestTeleporter(aI)
     local p = aI.Position
-    local best, dist = nil, math.huge
+    local best, d_dist = nil, math.huge
     local list = {}
     if World3 then
         list = {Vector3.new(-5096.27, 314.74, -3142.80), Vector3.new(-12471.17, 375.14, -7551.68), Vector3.new(5643.49, 1014.52, -341.89)}
@@ -1217,158 +1275,157 @@ function CheckNearestTeleporter(aI)
     end
     for _, v in ipairs(list) do
         local d = (v - p).Magnitude
-        if d < dist then
-            dist = d
+        if d < d_dist then
+            d_dist = d
             best = v
         end
     end
-    local hrp = game.Players.LocalPlayer.Character and game.Players.LocalPlayer.Character:FindFirstChild("HumanoidRootPart")
-    if hrp and best and dist <= (p - hrp.Position).Magnitude then
+    local hrp = LP.Character and LP.Character:FindFirstChild("HumanoidRootPart")
+    if hrp and best and d_dist <= (p - hrp.Position).Magnitude then
         return best
     end
 end
 
 function requestEntrance(pos)
-    game:GetService("ReplicatedStorage").Remotes.CommF_:InvokeServer("requestEntrance", pos)
-    local hrp = game.Players.LocalPlayer.Character and game.Players.LocalPlayer.Character:FindFirstChild("HumanoidRootPart")
+    RS.Remotes.CommF_:InvokeServer("requestEntrance", pos)
+    local hrp = LP.Character and LP.Character:FindFirstChild("HumanoidRootPart")
     if hrp then
         hrp.CFrame = hrp.CFrame + Vector3.new(0, 50, 0)
     end
     task.wait(0.35)
 end
 
-task.spawn(function()
-	while task.wait() do
-		if C and C.Parent == workspace then
-			(getgenv()).OnFarm = shouldTween or false
-		else
-			(getgenv()).OnFarm = false
-		end
-	end
-end)
-
-task.spawn(function()
-	local I = game.Players.LocalPlayer
-	repeat task.wait() until I.Character and I.Character.PrimaryPart
-	C.CFrame = I.Character.PrimaryPart.CFrame
-	while task.wait() do
-		pcall(function()
-			if (getgenv()).OnFarm then
-				local char = I.Character
-				if char and char.PrimaryPart then
-					if (char.PrimaryPart.Position - C.Position).Magnitude <= 200 then
-						char.PrimaryPart.CFrame = C.CFrame
-					else
-						C.CFrame = char.PrimaryPart.CFrame
-					end
-					for _, v in pairs(char:GetChildren()) do
-						if v:IsA("BasePart") then v.CanCollide = false end
-					end
-				end
-			else
-				local char = I.Character
-				if char then
-					for _, v in pairs(char:GetChildren()) do
-						if v:IsA("BasePart") then v.CanCollide = true end
-					end
-				end
-			end
-		end)
-	end
-end)
-
 function WaitRespawn()
 	local t0 = os.clock()
-	while os.clock() - t0 < 7 do
-		local c = game.Players.LocalPlayer.Character
-		if c and c:FindFirstChild("HumanoidRootPart") and c:FindFirstChildOfClass("Humanoid") and c:FindFirstChildOfClass("Humanoid").Health > 0 then
-			return true
-		end
+	while os.clock() - t0 < getgenv().PMT_RESPAWN_TIMEOUT do
+		local c = LP.Character
+		local hrp = c and c:FindFirstChild("HumanoidRootPart")
+		local hum = c and c:FindFirstChildOfClass("Humanoid")
+		if hrp and hum and hum.Health > 0 then return true end
 		task.wait(0.2)
 	end
 	return false
 end
 
 function HoldTPAndReset(pos)
-	local lp = game.Players.LocalPlayer
-	local c = lp.Character
-	if not c or not c:FindFirstChild("HumanoidRootPart") then return end
-	local hrp = c.HumanoidRootPart
-	local hum = c:FindFirstChildOfClass("Humanoid")
+	local c, hrp, hum = GetChar()
+	if not c then return false end
 	local cf = CFrame.new(pos)
 	local t0 = os.clock()
-	while os.clock() - t0 < 2 do
+	while os.clock() - t0 < getgenv().PMT_HOLD_TIME do
 		pcall(function()
 			hrp.CFrame = cf
 			hrp.AssemblyLinearVelocity = Vector3.zero
 		end)
-		task.wait(0.03)
+		task.wait(getgenv().PMT_HOLD_STEP)
 	end
 	if hum then hum.Health = 0 end
+	return true
+end
+
+function dijkstra(nodes, startName, goalName, maxStep)
+	local adj = {}
+	for _, a in ipairs(nodes) do adj[a] = {} end
+	for i=1,#nodes do
+		local ai = nodes[i]
+		local ap = getgenv().PMT_DATA.Islands[ai].Position
+		for j=i+1,#nodes do
+			local bj = nodes[j]
+			local bp = getgenv().PMT_DATA.Islands[bj].Position
+			local d = dist(ap, bp)
+			if d <= maxStep then
+				adj[ai][bj] = d
+				adj[bj][ai] = d
+			end
+		end
+	end
+	local distMap, prev, used = {}, {}, {}
+	for _, n in ipairs(nodes) do distMap[n] = math.huge end
+	distMap[startName] = 0
+	while true do
+		local u, best = nil, math.huge
+		for _, n in ipairs(nodes) do
+			if not used[n] and distMap[n] < best then best, u = distMap[n], n end
+		end
+		if not u or u == goalName then break end
+		used[u] = true
+		for v, w in pairs(adj[u]) do
+			if not used[v] then
+				local nd = distMap[u] + w
+				if nd < distMap[v] then distMap[v], prev[v] = nd, u end
+			end
+		end
+	end
+	if distMap[goalName] == math.huge then return nil end
+	local path, cur = {}, goalName
+	while cur do
+		table.insert(path, 1, cur)
+		cur = prev[cur]
+	end
+	return path
+end
+
+local _STOP, _RUN = false, false
+
+function PMT_FastHopTo(targetName)
+	targetName = normName(targetName)
+	if not (targetName and getgenv().PMT_DATA.Islands[targetName]) then return false end
+	local nodes = buildNodes()
+	local _, hrp = GetChar()
+	if not hrp then return false end
+	local startIsland = nearestIsland(hrp.Position, nodes)
+	local path = dijkstra(nodes, startIsland, targetName, getgenv().PMT_MAX_STEP_DIST)
+	if not path then return false end
+	_RUN, _STOP = true, false
+	for _, name in ipairs(path) do
+		if _STOP then break end
+		local pos = getgenv().PMT_DATA.Islands[name].Position
+		local _, hrp2 = GetChar()
+		if hrp2 and dist(hrp2.Position, pos) <= getgenv().PMT_SKIP_IF_NEAR then
+			task.wait(0.1)
+		else
+			if not HoldTPAndReset(pos) or _STOP then break end
+			if not WaitRespawn() or _STOP then break end
+		end
+		task.wait(0.2)
+	end
+	_RUN = false
+	return not _STOP
 end
 
 _tp = function(I)
-    local lp = game.Players.LocalPlayer
-    local e = lp.Character
-    if not e or not e:FindFirstChild("HumanoidRootPart") then return end
-
+    local e, hrp = GetChar()
+    if not hrp then return end
     if getgenv().UsePortals then
         local portal = CheckNearestTeleporter(I)
         if portal then
             requestEntrance(portal)
-            C.CFrame = e.HumanoidRootPart.CFrame
+            C.CFrame = hrp.CFrame
             task.wait(0.1)
         end
     end
-
     if _G.Bypass then
-        local targetPos = I.Position
-        while true do
-            local char = lp.Character
-            if not char or not char:FindFirstChild("HumanoidRootPart") then break end
-            local currentPos = char.HumanoidRootPart.Position
-            local distance = (currentPos - targetPos).Magnitude
-
-            if distance <= 2500 then break end
-
-            local bestIsland, bestD = nil, math.huge
-            local currentWorld = World3 and "World3" or World2 and "World2" or "World1"
-            
-            for _, name in ipairs(getgenv().PMT_DATA.Worlds[currentWorld]) do
-                local islandCF = getgenv().PMT_DATA.Islands[name]
-                if islandCF then
-                    local dToTarget = (islandCF.Position - targetPos).Magnitude
-                    if dToTarget < bestD then
-                        bestD = dToTarget
-                        bestIsland = islandCF.Position
-                    end
-                end
-            end
-
+        local posTo = I.Position
+        if (hrp.Position - posTo).Magnitude > 2000 then
+            local nodes = buildNodes()
+            local bestIsland = nearestIsland(posTo, nodes)
             if bestIsland then
-                HoldTPAndReset(bestIsland)
-                WaitRespawn()
-                e = lp.Character
-            else
-                break
+                PMT_FastHopTo(bestIsland)
+                e, hrp = GetChar()
             end
         end
     end
-
-    local HRP = e.HumanoidRootPart
     shouldTween = true
     getgenv().OnFarm = false
-    if HRP.Anchored then HRP.Anchored = false end
-
-    local dist = (I.Position - HRP.Position).Magnitude
-    local speed = dist <= 15 and (getgenv().TweenSpeedNear or 600) or (getgenv().TweenSpeedFar or 300)
-    local info = TweenInfo.new(dist / speed, Enum.EasingStyle.Linear)
-    local tween = game:GetService("TweenService"):Create(C, info, {CFrame = I})
-
-    if e:FindFirstChildOfClass("Humanoid") and e:FindFirstChildOfClass("Humanoid").Sit then
+    if hrp.Anchored then hrp.Anchored = false end
+    local distance = (I.Position - hrp.Position).Magnitude
+    local speed = distance <= 15 and (getgenv().TweenSpeedNear or 600) or (getgenv().TweenSpeedFar or 300)
+    local info = TweenInfo.new(distance / speed, Enum.EasingStyle.Linear)
+    local tween = TS:Create(C, info, {CFrame = I})
+    local hum = e:FindFirstChildOfClass("Humanoid")
+    if hum and hum.Sit then
         C.CFrame = CFrame.new(C.Position.X, I.Y, C.Position.Z)
     end
-
     tween:Play()
     task.spawn(function()
         while tween.PlaybackState == Enum.PlaybackState.Playing do
@@ -1380,7 +1437,87 @@ _tp = function(I)
 end
 
 TeleportToTarget = function(I) _tp(I) end
-notween = function(I) game.Players.LocalPlayer.Character.HumanoidRootPart.CFrame = I end
+notween = function(I) if LP.Character and LP.Character:FindFirstChild("HumanoidRootPart") then LP.Character.HumanoidRootPart.CFrame = I end end
+
+task.spawn(function()
+	while task.wait() do
+		if C and C.Parent == workspace then
+			getgenv().OnFarm = shouldTween or false
+		else
+			getgenv().OnFarm = false
+		end
+	end
+end)
+
+task.spawn(function()
+	repeat task.wait() until LP.Character and LP.Character:FindFirstChild("HumanoidRootPart")
+	C.CFrame = LP.Character.HumanoidRootPart.CFrame
+	while task.wait() do
+		pcall(function()
+			local char, hrp = GetChar()
+			if getgenv().OnFarm then
+				if char and hrp then
+					if (hrp.Position - C.Position).Magnitude <= 200 then
+						hrp.CFrame = C.CFrame
+					else
+						C.CFrame = hrp.CFrame
+					end
+					for _, v in pairs(char:GetChildren()) do
+						if v:IsA("BasePart") then v.CanCollide = false end
+					end
+				end
+			else
+				if char then
+					for _, v in pairs(char:GetChildren()) do
+						if v:IsA("BasePart") then v.CanCollide = true end
+					end
+				end
+			end
+		end)
+	end
+end)
+
+task.spawn(function()
+	while task.wait(0.25) do
+		if _G.Tpfast and not _RUN then
+			local target = _G.Islandtp
+			if target and target ~= "" then
+				_STOP = false
+				PMT_FastHopTo(target)
+			end
+		end
+	end
+end)
+
+function PMT_IsNearIsland(name, range)
+	local cf = getgenv().PMT_DATA.Islands[name]
+	if not cf then return true end
+	local _, hrp = GetChar()
+	if not hrp then return false end
+	return (hrp.Position - cf.Position).Magnitude <= (range or 2500)
+end
+
+function PMT_EnsureIsland(name, range, tries)
+	range = range or 3000
+	tries = tries or 3
+	if PMT_IsNearIsland(name, range) then return true end
+	for _ = 1, tries do
+		if not (_G.AutoFarm_Bone and _G.Bypass) then
+			return PMT_IsNearIsland(name, range)
+		end
+		_STOP = true
+		task.wait(0.1)
+		if _G.Bypass then
+			pcall(function() PMT_FastHopTo(name) end)
+		else
+			local cf = getgenv().PMT_DATA.Islands[name]
+			if cf then pcall(function() _tp(cf) end) end
+		end
+		task.wait(0.25)
+		if PMT_IsNearIsland(name, range) then return true end
+	end
+	return PMT_IsNearIsland(name, range)
+end
 
 
 
