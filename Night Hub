@@ -3845,328 +3845,258 @@ spawn(function()
 end);
 end
 RR:AddSeperator("Farm Mastery")
-local TargetMobs = {
-"Reborn Skeleton",
-"Living Zombie",
-"Demonic Soul",
-"Posessed Mummy"
+
+local TargetMobsMastery = {
+	"Reborn Skeleton",
+	"Living Zombie",
+	"Demonic Soul",
+	"Posessed Mummy"
 }
-local FarmPos = CFrame.new(
--9513.63867, 164.010269, 5786.66895,
--0.0950724334, 9.31791888e-08, 0.995470345,
-7.18874515e-09, 1, -9.29166148e-08,
--0.995470345, -1.67762626e-09, -0.0950724334
+
+local FarmPosMastery = CFrame.new(
+	-9513.63867, 164.010269, 5786.66895,
+	-0.0950724334, 9.31791888e-08, 0.995470345,
+	7.18874515e-09, 1, -9.29166148e-08,
+	-0.995470345, -1.67762626e-09, -0.0950724334
 )
-local function GetClosestMob()
-local closestDist = math.huge
-local target = nil
-local hrp = game.Players.LocalPlayer.Character
-and game.Players.LocalPlayer.Character:FindFirstChild("HumanoidRootPart")
-if not hrp then return nil end
-local playerPos = hrp.Position
 
-for _, v in pairs(game:GetService("Workspace").Enemies:GetChildren()) do
-	local isTarget = false
-	for _, name in pairs(TargetMobs) do
-		if v.Name == name then
-			isTarget = true
-			break
+local function GetClosestMobMastery()
+	local closestDist = math.huge
+	local target = nil
+	local hrp = game.Players.LocalPlayer.Character and game.Players.LocalPlayer.Character:FindFirstChild("HumanoidRootPart")
+	if not hrp then return nil end
+	for _, v in pairs(game:GetService("Workspace").Enemies:GetChildren()) do
+		local isTarget = false
+		for _, name in pairs(TargetMobsMastery) do
+			if v.Name == name then isTarget = true break end
+		end
+		if isTarget and v:FindFirstChild("Humanoid") and v.Humanoid.Health > 0 and v:FindFirstChild("HumanoidRootPart") then
+			local dist = (v.HumanoidRootPart.Position - hrp.Position).Magnitude
+			if dist < closestDist then
+				closestDist = dist
+				target = v
+			end
 		end
 	end
-
-	if isTarget
-		and v:FindFirstChild("Humanoid")
-		and v.Humanoid.Health > 0
-		and v:FindFirstChild("HumanoidRootPart") then
-
-		local dist = (v.HumanoidRootPart.Position - playerPos).Magnitude
-		if dist < closestDist then
-			closestDist = dist
-			target = v
-		end
-	end
+	return target
 end
-return target
 
-end
-RR:AddToggle({
-Title = "Auto Farm 600 In Swords",
-Description = "",
-Default = false,
-Callback = function(I)
-_G.FarmMastery_S = I
-end,
-})
-RR:AddDropdown({
-Title = "Select Type Farm",
-Description = "",
-Values = {
-"Tyrant Of The Skies",
-"Cake Prince",
-"Level",
-"Bone"
-},
-Default = "Bone",
-Callback = function(Value)
-_G.SelectTypeFarm = Value
-end
-})
 local function GetTargetByLevel()
-local myLevel = game.Players.LocalPlayer.Data.Level.Value
-if myLevel >= 2575 then
-return {
-Name = "Skull Slayer",
-QuestArgs = {"StartQuest", "TikiQuest3", 2},
-QuestPos = CFrame.new(-16665.0879, 105.27478, 1577.61743, -0.999621451, 3.5280582e-08, 0.0275127869, 3.5990368e-08, 1, 2.53032191e-08, -0.0275127869, 2.62838356e-08, -0.999621451),
-FarmPos = CFrame.new(-16709.49, 419.68, 1751.09)
-}
-elseif myLevel > 2550 then
-return {
-Name = "Serpent Hunter",
-QuestArgs = {"StartQuest", "TikiQuest3", 1},
-QuestPos = CFrame.new(-16665.0879, 105.27478, 1577.61743, -0.999621451, 3.5280582e-08, 0.0275127869, 3.5990368e-08, 1, 2.53032191e-08, -0.0275127869, 2.62838356e-08, -0.999621451),
-FarmPos = CFrame.new(-16645.64, 163.09, 1352.87)
-}
-elseif myLevel >= 2525 then
-return {
-Name = "Isle Champion",
-QuestArgs = {"StartQuest", "TikiQuest2", 2},
-QuestPos = CFrame.new(-16546.748, 55.7216759, -172.865311, -0.0595058464, 2.45485676e-08, 0.998227954, -5.3272025e-08, 1, -2.77677703e-08, -0.998227954, -5.48299717e-08, -0.0595058464),
-FarmPos = CFrame.new(-16602.1015625, 130.38734436035, 1087.2456054688)
-}
-elseif myLevel >= 2500 then
-return {
-Name = "Sun-kissed Warrior",
-QuestArgs = {"StartQuest", "TikiQuest2", 1},
-QuestPos = CFrame.new(-16546.748, 55.7216759, -172.865311, -0.0595058464, 2.45485676e-08, 0.998227954, -5.3272025e-08, 1, -2.77677703e-08, -0.998227954, -5.48299717e-08, -0.0595058464),
-FarmPos = CFrame.new(-16347, 64, 984)
-}
-elseif myLevel >= 2475 then
-return {
-Name = "Island Boy",
-QuestArgs = {"StartQuest", "TikiQuest1", 2},
-QuestPos = CFrame.new(-16546.748, 55.7216759, -172.865311, -0.0595058464, 2.45485676e-08, 0.998227954, -5.3272025e-08, 1, -2.77677703e-08, -0.998227954, -5.48299717e-08, -0.0595058464),
-FarmPos = CFrame.new(-16670, 43, -270)
-}
-else
-return {
-Name = "Isle Outlaw",
-QuestArgs = {"StartQuest", "TikiQuest1", 1},
-QuestPos = CFrame.new(-16546.748, 55.7216759, -172.865311, -0.0595058464, 2.45485676e-08, 0.998227954, -5.3272025e-08, 1, -2.77677703e-08, -0.998227954, -5.48299717e-08, -0.0595058464),
-FarmPos = CFrame.new(-16350, 45, -180)
-}
-end
-end
-local function GetEyesCount()
-local model = workspace:FindFirstChild("Map") and workspace.Map:FindFirstChild("TikiOutpost") and workspace.Map.TikiOutpost:FindFirstChild("IslandModel")
-local count = 0
-if model then
-local eye1 = model:FindFirstChild("Eye1")
-local eye2 = model:FindFirstChild("Eye2")
-local chunks = model:FindFirstChild("IslandChunks")
-local eye3 = chunks and chunks:FindFirstChild("E") and chunks.E:FindFirstChild("Eye3")
-local eye4 = chunks and chunks:FindFirstChild("E") and chunks.E:FindFirstChild("Eye4")
-if eye1 and eye1.Transparency == 0 then count = count + 1 end
-if eye2 and eye2.Transparency == 0 then count = count + 1 end
-if eye3 and eye3.Transparency == 0 then count = count + 1 end
-if eye4 and eye4.Transparency == 0 then count = count + 1 end
-end
-return count
-end
-local function UseAllCategorySkills()
-local VirtualInputManager = game:GetService("VirtualInputManager")
-local VirtualUser = game:GetService("VirtualUser")
-local categories = {"Melee", "Blox Fruit", "Sword", "Gun"}
-local skills = {"Z", "X", "C"}
-pcall(function()  
-    game:GetService("VirtualInputManager"):SendKeyEvent(true, "RightControl", false, game)  
-    workspace.CurrentCamera.CFrame = CFrame.new(workspace.CurrentCamera.CFrame.Position, workspace.CurrentCamera.CFrame.Position + Vector3.new(0,-1,0))  
-end)  
-
-for _, toolType in ipairs(categories) do  
-    local tool = nil  
-    for _, v in pairs(game.Players.LocalPlayer.Backpack:GetChildren()) do  
-        if v:IsA("Tool") and v.ToolTip == toolType then tool = v break end  
-    end  
-    if not tool then  
-        local charTool = game.Players.LocalPlayer.Character:FindFirstChildOfClass("Tool")  
-        if charTool and charTool.ToolTip == toolType then tool = charTool end  
-    end  
-    if tool then  
-        game.Players.LocalPlayer.Character.Humanoid:EquipTool(tool)  
-        task.wait(0.1)  
-        for i = 1, 3 do  
-            VirtualUser:CaptureController()  
-            VirtualUser:ClickButton1(Vector2.new(851, 158))  
-            local skillKey = skills[i]  
-            if skillKey then  
-                VirtualInputManager:SendKeyEvent(true, skillKey, false, game)  
-                task.wait(0.05)  
-                VirtualInputManager:SendKeyEvent(false, skillKey, false, game)  
-            end  
-            task.wait(0.1)   
-        end  
-    end  
-end
-
-end
-local function GetNearestMob(TargetName)
-local plr = game.Players.LocalPlayer
-local Root = plr.Character and plr.Character:FindFirstChild("HumanoidRootPart")
-if not Root then return nil end
-local Closest, Dist = nil, math.huge
-for _, Mob in pairs(workspace.Enemies:GetChildren()) do
-if G.Alive(Mob) and Mob.Name == TargetName and Mob:FindFirstChild("HumanoidRootPart") then
-local d = (Mob.HumanoidRootPart.Position - Root.Position).Magnitude
-if d < Dist then Dist = d Closest = Mob end
-end
-end
-return Closest
-end
-spawn(function()
-local VaseIndex = 1
-local CurrentMob = nil
-local lastAirCFrame = nil
-while task.wait() do
-    if _G.FarmMastery_S then
-        pcall(function()
-            local Plr = game.Players.LocalPlayer
-            local Char = Plr.Character or Plr.CharacterAdded:Wait()
-            local Root = Char:FindFirstChild("HumanoidRootPart")
-            local Hum = Char:FindFirstChild("Humanoid")
-            if not Root or not Hum or Hum.Health <= 0 then return end
-
-            local selectedSword = nil
-            for _, e in next, replicated.Remotes.CommF_:InvokeServer("getInventory") do
-                if type(e) == "table" and e.Type == "Sword" then
-                    if (tonumber(e.Mastery) or 0) < 600 then
-                        selectedSword = e.Name
-                        if not Char:FindFirstChild(selectedSword) and not Plr.Backpack:FindFirstChild(selectedSword) then
-                            replicated.Remotes.CommF_:InvokeServer("LoadItem", selectedSword)
-                        end
-                        break
-                    end
-                end
-            end
-            
-            if not selectedSword then return end
-
-            if _G.SelectTypeFarm == "Tyrant Of The Skies" then
-                local boss = workspace.Enemies:FindFirstChild("Tyrant of the Skies")
-                local eyes = GetEyesCount()
-
-                if boss and boss:FindFirstChild("Humanoid") and boss.Humanoid.Health > 0 then
-                    repeat
-                        task.wait()
-                        G.Sword(boss, _G.FarmMastery_S)
-                    until not _G.FarmMastery_S or not boss.Parent or boss.Humanoid.Health <= 0
-                elseif eyes == 4 then
-                    local targetsty = {  
-                        CFrame.new(-16335.1, 158.1, 1465.6), CFrame.new(-16288.6, 158.1, 1470.3),  
-                        CFrame.new(-16258.0, 156.7, 1461.4), CFrame.new(-16212.4, 158.1, 1466.3),  
-                        CFrame.new(-16335.0, 159.3, 1324.8), CFrame.new(-16286.0, 155.9, 1323.8),  
-                        CFrame.new(-16250.3, 159.3, 1316.3)  
-                    }  
-                    local pos = targetsty[VaseIndex]  
-                    if pos then  
-                        if (Root.Position - pos.Position).Magnitude < 15 then  
-                            Root.CFrame = pos
-                            if _G.UseSkullSummon then
-                                game:GetService("ReplicatedStorage").Remotes.CommF_:InvokeServer("LoadItem", "Skull Guitar")  
-                                local guitar = Char:FindFirstChild("Skull Guitar")  
-                                if guitar and guitar:FindFirstChild("RemoteEvent") then guitar.RemoteEvent:FireServer("TAP", pos.Position) game:GetService("ReplicatedStorage").Remotes.Validator2:FireServer(8359618, 0) end
-                            else UseAllCategorySkills() end
-                            task.wait(0.1) VaseIndex = VaseIndex + 1 if VaseIndex > #targetsty then VaseIndex = 1 end
-                        else if _tp then _tp(pos) end end
-                    end
-                else
-                    local TargetData = GetTargetByLevel()
-                    local ClosestEnemy = nil
-                    local ShortestDistance = math.huge
-                    local AllMobs = {"Skull Slayer", "Serpent Hunter", "Isle Champion", "Sun-kissed Warrior", "Island Boy", "Isle Outlaw"}
-                    for _, e in pairs(workspace.Enemies:GetChildren()) do
-                        if table.find(AllMobs, e.Name) and e:FindFirstChild("Humanoid") and e.Humanoid.Health > 0 then
-                            local dist = (Root.Position - e.HumanoidRootPart.Position).Magnitude
-                            if dist < ShortestDistance then ShortestDistance = dist ClosestEnemy = e end
-                        end
-                    end
-                    if ClosestEnemy then
-                        repeat task.wait() G.Sword(ClosestEnemy, _G.FarmMastery_S) until not _G.FarmMastery_S or not ClosestEnemy.Parent or ClosestEnemy.Humanoid.Health <= 0
-                    else if _tp then _tp(TargetData.FarmPos) end end
-                end
-
-            elseif _G.SelectTypeFarm == "Cake Prince" then
-                local enemies = workspace:FindFirstChild("Enemies")
-                local CakePos = CFrame.new(-2091.91, 70.00, -12142.83)
-                local PortalEntrance = CFrame.new(-2151.82, 149.32, -12404.91)
-                local mirror = workspace.Map:FindFirstChild("CakeLoaf")
-                mirror = mirror and mirror:FindFirstChild("BigMirror")
-                local other = mirror and mirror:FindFirstChild("Other")
-                local portalOpen = other and other.Transparency == 0
-                local boss = enemies:FindFirstChild("Cake Prince") or enemies:FindFirstChild("Dough King")
-
-                if not boss and not portalOpen and (Root.Position - CakePos.Position).Magnitude > 3000 then _tp(CakePos) return end
-                if boss or portalOpen then
-                    lastAirCFrame = nil
-                    if boss and boss.Humanoid.Health > 0 and boss.PrimaryPart then
-                        _tp(boss.PrimaryPart.CFrame * CFrame.new(0, 25, 0) * CFrame.Angles(math.rad(-90), 0, 0))
-                        G.Sword(boss, _G.FarmMastery_S) return
-                    end
-                    if (Root.Position - PortalEntrance.Position).Magnitude < 500 then TeleportConditional(Root, PortalEntrance, TELEPORT_DISTANCE_THRESHOLD) end
-                    return
-                end
-                
-                local bestMob = nil
-                local CAKE_MOBS = {"Cookie Crafter", "Cake Guard", "Baking Staff", "Head Baker"}
-                for _, mob in ipairs(enemies:GetChildren()) do
-                    if table.find(CAKE_MOBS, mob.Name) and mob:FindFirstChild("Humanoid") and mob.Humanoid.Health > 0 then
-                        bestMob = mob break
-                    end
-                end
-                if bestMob then
-                    repeat task.wait()
-                        if (workspace.Map.CakeLoaf.BigMirror.Other.Transparency == 0) or enemies:FindFirstChild("Cake Prince") then break end
-                        local targetCFrame = bestMob.HumanoidRootPart.CFrame * CFrame.new(0, 20, 0) * CFrame.Angles(math.rad(-90), 0, 0)
-                        if lastAirCFrame then targetCFrame = CFrame.new(targetCFrame.Position.X, lastAirCFrame.Position.Y, targetCFrame.Position.Z) * CFrame.Angles(math.rad(-90), 0, 0) end
-                        _tp(targetCFrame)
-                        if not lastAirCFrame or targetCFrame.Position.Y > lastAirCFrame.Position.Y then lastAirCFrame = targetCFrame end
-                        G.Sword(bestMob, _G.FarmMastery_S)
-                    until not _G.FarmMastery_S or not bestMob.Parent or bestMob.Humanoid.Health <= 0
-                else lastAirCFrame = nil TeleportConditional(Root, CFrame.new(-1927.92, 37.80, -12842.54), TELEPORT_DISTANCE_THRESHOLD) end
-
-            elseif _G.SelectTypeFarm == "Level" then
-                local QuestTitle = Plr.PlayerGui.Main.Quest.Container.QuestTitle.Title.Text      
-                local Q = QuestNeta()  
-                if not string.find(QuestTitle, Q[5]) then game:GetService("ReplicatedStorage").Remotes.CommF_:InvokeServer("AbandonQuest") end      
-                if not Plr.PlayerGui.Main.Quest.Visible then      
-                    local SafeQuestPos = Q[6] * CFrame.new(0, 8, 0) 
-                    TeleportConditional(Root, SafeQuestPos, TELEPORT_DISTANCE_THRESHOLD)      
-                    if (Root.Position - SafeQuestPos.Position).Magnitude <= 50 then      
-                        task.wait(1.9)  
-                        game:GetService("ReplicatedStorage").Remotes.CommF_:InvokeServer("StartQuest", Q[3], Q[2])      
-                    end      
-                    return      
-                end      
-                local Nearest = GetNearestMob(Q[1])  
-                if CurrentMob and G.Alive(CurrentMob) then G.Sword(CurrentMob, _G.FarmMastery_S) return else CurrentMob = nil end      
-                if not Nearest then TeleportConditional(Root, Q[4], TELEPORT_DISTANCE_THRESHOLD) return end
-                CurrentMob = Nearest
-                if CurrentMob then _tp(CurrentMob.HumanoidRootPart.CFrame) repeat task.wait() G.Sword(CurrentMob, _G.FarmMastery_S) until not _G.FarmMastery_S or not CurrentMob.Parent or CurrentMob.Humanoid.Health <= 0 end
-                CurrentMob = nil
-
-            elseif _G.SelectTypeFarm == "Bone" then
-                local Target = GetClosestMob()
-                if not Target then
-                    if (Root.Position - FarmPos.Position).Magnitude > 150 then _tp(FarmPos) end
-                else
-                    repeat task.wait() if Target and Target:FindFirstChild("HumanoidRootPart") and Target.Humanoid.Health > 0 then G.Sword(Target, _G.FarmMastery_S) end
-                    until not _G.FarmMastery_S or not Target.Parent or Target.Humanoid.Health <= 0
-                end
-            end
-        end)
+    local myLevel = game.Players.LocalPlayer.Data.Level.Value
+    if myLevel >= 2575 then
+        return {Name = "Skull Slayer", FarmPos = CFrame.new(-16709.49, 419.68, 1751.09)}
+    elseif myLevel > 2550 then
+        return {Name = "Serpent Hunter", FarmPos = CFrame.new(-16645.64, 163.09, 1352.87)}
+    elseif myLevel >= 2525 then
+        return {Name = "Isle Champion", FarmPos = CFrame.new(-16602.1015625, 130.38734436035, 1087.2456054688)}
+    elseif myLevel >= 2500 then
+        return {Name = "Sun-kissed Warrior", FarmPos = CFrame.new(-16347, 64, 984)}
+    elseif myLevel >= 2475 then
+        return {Name = "Island Boy", FarmPos = CFrame.new(-16670, 43, -270)}
+    else
+        return {Name = "Isle Outlaw", FarmPos = CFrame.new(-16350, 45, -180)}
     end
 end
 
+local function GetEyesCount()
+    local model = workspace:FindFirstChild("Map") and workspace.Map:FindFirstChild("TikiOutpost") and workspace.Map.TikiOutpost:FindFirstChild("IslandModel")
+    local count = 0
+    if model then
+        local eye1 = model:FindFirstChild("Eye1")
+        local eye2 = model:FindFirstChild("Eye2")
+        local chunks = model:FindFirstChild("IslandChunks")
+        local eye3 = chunks and chunks:FindFirstChild("E") and chunks.E:FindFirstChild("Eye3")
+        local eye4 = chunks and chunks:FindFirstChild("E") and chunks.E:FindFirstChild("Eye4")
+        if eye1 and eye1.Transparency == 0 then count = count + 1 end
+        if eye2 and eye2.Transparency == 0 then count = count + 1 end
+        if eye3 and eye3.Transparency == 0 then count = count + 1 end
+        if eye4 and eye4.Transparency == 0 then count = count + 1 end
+    end
+    return count
+end
+
+local function UseAllCategorySkills()
+    local VirtualInputManager = game:GetService("VirtualInputManager")
+    local VirtualUser = game:GetService("VirtualUser")
+    local categories = {"Melee", "Blox Fruit", "Sword", "Gun"}
+    local skills = {"Z", "X", "C"}
+    pcall(function()  
+        game:GetService("VirtualInputManager"):SendKeyEvent(true, "RightControl", false, game)  
+        workspace.CurrentCamera.CFrame = CFrame.new(workspace.CurrentCamera.CFrame.Position, workspace.CurrentCamera.CFrame.Position + Vector3.new(0,-1,0))  
+    end)  
+    for _, toolType in ipairs(categories) do  
+        local tool = nil  
+        for _, v in pairs(game.Players.LocalPlayer.Backpack:GetChildren()) do  
+            if v:IsA("Tool") and v.ToolTip == toolType then tool = v break end  
+        end  
+        if not tool then  
+            local charTool = game.Players.LocalPlayer.Character:FindFirstChildOfClass("Tool")  
+            if charTool and charTool.ToolTip == toolType then tool = charTool end  
+        end  
+        if tool then  
+            game.Players.LocalPlayer.Character.Humanoid:EquipTool(tool)  
+            task.wait(0.1)  
+            for i = 1, 3 do  
+                VirtualUser:CaptureController()  
+                VirtualUser:ClickButton1(Vector2.new(851, 158))  
+                local skillKey = skills[i]  
+                if skillKey then  
+                    VirtualInputManager:SendKeyEvent(true, skillKey, false, game)  
+                    task.wait(0.05)  
+                    VirtualInputManager:SendKeyEvent(false, skillKey, false, game)  
+                end  
+                task.wait(0.1)   
+            end  
+        end  
+    end
+end
+
+local function GetNearestMob(TargetName)
+    local plr = game.Players.LocalPlayer
+    local Root = plr.Character and plr.Character:FindFirstChild("HumanoidRootPart")
+    if not Root then return nil end
+    local Closest, Dist = nil, math.huge    
+    for _, Mob in pairs(workspace.Enemies:GetChildren()) do    
+        if G.Alive(Mob) and Mob.Name == TargetName and Mob:FindFirstChild("HumanoidRootPart") then    
+            local d = (Mob.HumanoidRootPart.Position - Root.Position).Magnitude    
+            if d < Dist then Dist = d Closest = Mob end    
+        end    
+    end  
+    return Closest
+end
+
+local function EquipMasterySword()
+    for _, e in next, replicated.Remotes.CommF_:InvokeServer("getInventory") do
+        if type(e) == "table" and e.Type == "Sword" then
+            local SwordName = e.Name
+            local Mastery = tonumber(e.Mastery) or 0
+            if Mastery < 600 then
+                if GetBP(SwordName) then
+                    return true
+                else
+                    replicated.Remotes.CommF_:InvokeServer("LoadItem", SwordName)
+                    return true
+                end
+            end
+        end
+    end
+    return false
+end
+
+RR:AddDropdown({
+    Title = "Select Type Farm",
+    Values = {"Bone", "Tyrant Of The Skies", "Cake Prince", "Level"},
+    Default = "Bone",
+    Callback = function(Value)
+        _G.SelectFarmMode = Value
+    end,
+})
+
+RR:AddToggle({
+	Title = "Auto Farm 600 In Swords",
+	Default = false,
+	Callback = function(I)
+		_G.FarmMastery_S = I
+	end,
+})
+
+spawn(function()
+    local VaseIndex = 1
+    local lastAirCFrame = nil
+    
+    while task.wait(0.1) do
+        if _G.FarmMastery_S then
+            pcall(function()
+                local character = game.Players.LocalPlayer.Character
+                if not character or not character:FindFirstChild("HumanoidRootPart") then return end
+                local hrp = character.HumanoidRootPart
+                
+                if not EquipMasterySword() then return end
+
+                if _G.SelectFarmMode == "Bone" then
+                    local Target = GetClosestMobMastery()
+                    if not Target then
+                        if (hrp.Position - FarmPosMastery.Position).Magnitude > 150 then
+                            _tp(FarmPosMastery)
+                        end
+                    else
+                        repeat
+                            wait()
+                            if _G.FarmMastery_S and Target and Target:FindFirstChild("HumanoidRootPart") and Target.Humanoid.Health > 0 then
+                                G.Sword(Target, _G.FarmMastery_S)
+                            end
+                        until not _G.FarmMastery_S or not Target.Parent or Target.Humanoid.Health <= 0
+                    end
+
+                elseif _G.SelectFarmMode == "Tyrant Of The Skies" then
+                    local boss = workspace.Enemies:FindFirstChild("Tyrant of the Skies")
+                    local eyes = GetEyesCount()
+                    if boss and boss:FindFirstChild("Humanoid") and boss.Humanoid.Health > 0 then
+                        repeat task.wait() G.Kill(boss, true) until not _G.FarmMastery_S or not boss.Parent or boss.Humanoid.Health <= 0
+                    elseif eyes == 4 then
+                        local targets = {CFrame.new(-16335.1, 158.1, 1465.6), CFrame.new(-16288.6, 158.1, 1470.3), CFrame.new(-16258.0, 156.7, 1461.4), CFrame.new(-16212.4, 158.1, 1466.3), CFrame.new(-16335.0, 159.3, 1324.8), CFrame.new(-16286.0, 155.9, 1323.8), CFrame.new(-16250.3, 159.3, 1316.3)}
+                        local pos = targets[VaseIndex]
+                        if (hrp.Position - pos.Position).Magnitude < 15 then
+                            hrp.CFrame = pos
+                            UseAllCategorySkills()
+                            VaseIndex = VaseIndex >= #targets and 1 or VaseIndex + 1
+                        else _tp(pos) end
+                    else
+                        local TargetData = GetTargetByLevel()
+                        local ClosestEnemy = nil
+                        local ShortestDistance = math.huge
+                        local AllMobs = {"Skull Slayer", "Serpent Hunter", "Isle Champion", "Sun-kissed Warrior", "Island Boy", "Isle Outlaw"}
+                        for _, e in pairs(workspace.Enemies:GetChildren()) do
+                            if table.find(AllMobs, e.Name) and e:FindFirstChild("Humanoid") and e.Humanoid.Health > 0 then
+                                local dist = (hrp.Position - e.HumanoidRootPart.Position).Magnitude
+                                if dist < ShortestDistance then ShortestDistance = dist ClosestEnemy = e end
+                            end
+                        end
+                        if ClosestEnemy then
+                            repeat task.wait() G.Kill(ClosestEnemy, true) until not _G.FarmMastery_S or not ClosestEnemy.Parent or ClosestEnemy.Humanoid.Health <= 0
+                        else _tp(TargetData.FarmPos) end
+                    end
+
+                elseif _G.SelectFarmMode == "Cake Prince" then
+                    local enemies = workspace:FindFirstChild("Enemies")
+                    local mirror = workspace.Map:FindFirstChild("CakeLoaf") and workspace.Map.CakeLoaf:FindFirstChild("BigMirror")
+                    local portalOpen = mirror and mirror:FindFirstChild("Other") and mirror.Other.Transparency == 0
+                    local boss = enemies:FindFirstChild("Cake Prince") or enemies:FindFirstChild("Dough King")
+                    if boss and boss:FindFirstChild("Humanoid") and boss.Humanoid.Health > 0 then
+                        _tp(boss.HumanoidRootPart.CFrame * CFrame.new(0, 25, 0) * CFrame.Angles(math.rad(-90), 0, 0))
+                        G.Kill(boss, true)
+                    elseif portalOpen then
+                        _tp(CFrame.new(-2151.82, 149.32, -12404.91))
+                    else
+                        local CAKE_MOBS = {"Cookie Crafter", "Cake Guard", "Baking Staff", "Head Baker"}
+                        local bestMob = nil
+                        for _, mob in ipairs(enemies:GetChildren()) do
+                            if table.find(CAKE_MOBS, mob.Name) and mob:FindFirstChild("Humanoid") and mob.Humanoid.Health > 0 then
+                                bestMob = mob break
+                            end
+                        end
+                        if bestMob then
+                            repeat
+                                task.wait()
+                                if not bestMob.Parent or bestMob.Humanoid.Health <= 0 then break end
+                                _tp(bestMob.HumanoidRootPart.CFrame * CFrame.new(0, 20, 0) * CFrame.Angles(math.rad(-90), 0, 0))
+                                G.Kill(bestMob, true)
+                            until not _G.FarmMastery_S or not bestMob.Parent
+                        else _tp(CFrame.new(-1927.92, 37.80, -12842.54)) end
+                    end
+
+                elseif _G.SelectFarmMode == "Level" then
+                    local Q = QuestNeta()
+                    local Nearest = GetNearestMob(Q[1])
+                    if Nearest then
+                        repeat task.wait() _tp(Nearest.HumanoidRootPart.CFrame) G.Kill(Nearest, true) until not _G.FarmMastery_S or not Nearest.Parent or Nearest.Humanoid.Health <= 0
+                    else
+                        _tp(Q[4])
+                    end
+                end
+            end)
+        end
+    end
 end)
 
 serverSection:AddSeperator("Server - Status");
