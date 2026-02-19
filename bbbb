@@ -1322,25 +1322,35 @@ _tp = function(I)
     end
 
     if _G.Bypass then
-        local posTo = I.Position
-        local hrp = e.HumanoidRootPart
-        if (hrp.Position - posTo).Magnitude > 2000 then
+        local targetPos = I.Position
+        while true do
+            local char = lp.Character
+            if not char or not char:FindFirstChild("HumanoidRootPart") then break end
+            local currentPos = char.HumanoidRootPart.Position
+            local distance = (currentPos - targetPos).Magnitude
+
+            if distance <= 2500 then break end
+
             local bestIsland, bestD = nil, math.huge
             local currentWorld = World3 and "World3" or World2 and "World2" or "World1"
+            
             for _, name in ipairs(getgenv().PMT_DATA.Worlds[currentWorld]) do
-                local cf = getgenv().PMT_DATA.Islands[name]
-                if cf then
-                    local d = (cf.Position - posTo).Magnitude
-                    if d < bestD then
-                        bestD = d
-                        bestIsland = cf.Position
+                local islandCF = getgenv().PMT_DATA.Islands[name]
+                if islandCF then
+                    local dToTarget = (islandCF.Position - targetPos).Magnitude
+                    if dToTarget < bestD then
+                        bestD = dToTarget
+                        bestIsland = islandCF.Position
                     end
                 end
             end
+
             if bestIsland then
                 HoldTPAndReset(bestIsland)
                 WaitRespawn()
                 e = lp.Character
+            else
+                break
             end
         end
     end
@@ -1371,6 +1381,7 @@ end
 
 TeleportToTarget = function(I) _tp(I) end
 notween = function(I) game.Players.LocalPlayer.Character.HumanoidRootPart.CFrame = I end
+
 
 
 
