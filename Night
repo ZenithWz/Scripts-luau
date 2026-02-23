@@ -1,0 +1,374 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Night Mystic</title>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <link href="https://fonts.googleapis.com/css2?family=Montserrat:wght@400;600;800&family=Orbitron:wght@700;900&display=swap" rel="stylesheet">
+    
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+            font-family: 'Montserrat', sans-serif;
+        }
+
+        body {
+            background-color: #030303;
+            color: #ffffff;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            min-height: 100vh;
+        }
+
+        .container {
+            background-color: rgba(10, 5, 5, 0.4);
+            border: 1px solid #1f1111;
+            border-radius: 15px;
+            width: 90%;
+            max-width: 500px;
+            padding: 40px 30px;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            box-shadow: 0 0 50px rgba(0, 0, 0, 0.5);
+        }
+
+        /* Language Selector */
+        .lang-selector {
+            display: flex;
+            gap: 10px;
+            margin-bottom: 30px;
+        }
+
+        .lang-btn {
+            background-color: transparent;
+            border: 1px solid #333;
+            color: #666;
+            padding: 5px 12px;
+            border-radius: 20px;
+            font-size: 10px;
+            font-weight: 600;
+            cursor: pointer;
+            transition: 0.3s;
+        }
+
+        .lang-btn.active {
+            border-color: #ff3333;
+            color: #ff3333;
+            background-color: rgba(255, 51, 51, 0.1);
+        }
+
+        /* Logo and Glow */
+        .logo-container {
+            margin-bottom: 20px;
+            filter: drop-shadow(0px 0px 15px rgba(255, 0, 0, 0.6));
+        }
+
+        /* Text Styles */
+        h1.title {
+            font-family: 'Orbitron', sans-serif;
+            color: #ff3333;
+            font-size: 32px;
+            font-weight: 900;
+            letter-spacing: 2px;
+            margin-bottom: 5px;
+            text-align: center;
+            text-shadow: 0 0 10px rgba(255, 51, 51, 0.5);
+        }
+
+        p.subtitle {
+            color: #666;
+            font-size: 12px;
+            font-weight: 600;
+            letter-spacing: 1px;
+            margin-bottom: 40px;
+        }
+
+        /* Button Grid */
+        .button-group {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 15px;
+            width: 100%;
+            margin-bottom: 15px;
+        }
+
+        .btn {
+            background-color: rgba(20, 10, 10, 0.6);
+            border: 1px solid #2a1515;
+            color: #ddd;
+            padding: 15px;
+            border-radius: 10px;
+            font-size: 14px;
+            font-weight: 600;
+            cursor: pointer;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            gap: 10px;
+            transition: all 0.3s ease;
+            text-decoration: none;
+        }
+
+        .btn:hover {
+            background-color: rgba(255, 51, 51, 0.1);
+            border-color: #ff3333;
+            color: #fff;
+        }
+
+        .btn i {
+            font-size: 16px;
+        }
+
+        /* Divider */
+        .divider {
+            width: 100%;
+            display: flex;
+            align-items: center;
+            text-align: center;
+            margin: 30px 0 20px 0;
+            color: #555;
+            font-size: 11px;
+            font-weight: 600;
+            letter-spacing: 1px;
+        }
+
+        .divider::before,
+        .divider::after {
+            content: '';
+            flex: 1;
+            border-bottom: 1px solid #1f1111;
+        }
+
+        .divider:not(:empty)::before { margin-right: 15px; }
+        .divider:not(:empty)::after { margin-left: 15px; }
+
+        /* Credits Section */
+        .credits {
+            text-align: center;
+            font-size: 13px;
+            color: #888;
+            font-weight: 600;
+            letter-spacing: 1px;
+        }
+
+        .credits span {
+            color: #ff3333;
+            font-family: 'Orbitron', sans-serif;
+        }
+
+        /* View Toggling Classes */
+        .hidden {
+            display: none !important;
+        }
+
+        /* Script View Specifics */
+        #script-view {
+            width: 100%;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+        }
+
+        .code-box {
+            background-color: #0a0a0a;
+            border: 1px solid #2a1515;
+            padding: 15px;
+            border-radius: 8px;
+            width: 100%;
+            margin-bottom: 20px;
+            overflow-x: auto;
+        }
+
+        .code-box code {
+            font-family: monospace;
+            color: #ff5555;
+            font-size: 13px;
+            white-space: nowrap;
+        }
+    </style>
+</head>
+<body>
+
+    <div class="container">
+        
+        <div class="lang-selector">
+            <button class="lang-btn active" onclick="setLanguage('PT', this)">PT</button>
+            <button class="lang-btn" onclick="setLanguage('EN', this)">EN</button>
+            <button class="lang-btn" onclick="setLanguage('VI', this)">VI</button>
+        </div>
+
+        <div class="logo-container">
+            <svg width="80" height="80" viewBox="0 0 100 100" xmlns="http://www.w3.org/2000/svg">
+                <path d="M50 5 A45 45 0 1 0 95 50 A35 35 0 0 1 50 5 Z" fill="#ff1a1a" />
+                <path d="M55 30 L65 40 L50 50 L70 55 L60 70 L45 55 Z" fill="#ff1a1a" />
+                <path d="M40 25 A25 25 0 0 1 70 35 L60 45 A15 15 0 0 0 45 40 Z" fill="#cc0000" />
+            </svg>
+        </div>
+
+        <h1 class="title">NIGHT MYSTIC</h1>
+        <p class="subtitle" id="text-subtitle">SCRIPT HUB PREMIUM</p>
+
+        <div id="main-view" style="width: 100%;">
+            <div class="button-group">
+                <button class="btn" onclick="toggleView('script')" id="text-getscript">
+                    <i class="fa-solid fa-code"></i> GET SCRIPT
+                </button>
+                
+                <a href="https://discord.gg/ge2g7kvDn3" target="_blank" class="btn">
+                    <i class="fa-brands fa-discord"></i> DISCORD
+                </a>
+            </div>
+
+            <div class="divider" id="text-devby">DESENVOLVIDO POR</div>
+
+            <div class="credits">
+                By <span>MauroZzx</span> & <span>Araujozwx</span>
+            </div>
+        </div>
+
+        <div id="script-view" class="hidden">
+            <div class="code-box">
+                <code id="script-text">loadstring(game:HttpGet("https://raw.githubusercontent.com/Dev-NightMystic/Night-Mystic-/refs/heads/main/NightMystic"))()</code>
+            </div>
+
+            <div class="button-group" style="display: flex; flex-direction: column;">
+                <button class="btn" onclick="copyScript()" id="copy-btn">
+                    <i class="fa-regular fa-copy"></i> COPIAR SCRIPT
+                </button>
+                <button class="btn" onclick="toggleView('main')" id="text-back">
+                    <i class="fa-solid fa-arrow-left"></i> VOLTAR
+                </button>
+            </div>
+        </div>
+
+    </div>
+
+    <script>
+        // Dicionário de Traduções
+        const translations = {
+            PT: {
+                subtitle: "SCRIPT HUB PREMIUM",
+                getscript: '<i class="fa-solid fa-code"></i> GET SCRIPT',
+                devby: "DESENVOLVIDO POR",
+                copy: '<i class="fa-regular fa-copy"></i> COPIAR SCRIPT',
+                back: '<i class="fa-solid fa-arrow-left"></i> VOLTAR',
+                copied: '<i class="fa-solid fa-check"></i> COPIADO!',
+                errorMsg: "Não foi possível copiar automaticamente. Selecione o texto e copie manualmente."
+            },
+            EN: {
+                subtitle: "PREMIUM SCRIPT HUB",
+                getscript: '<i class="fa-solid fa-code"></i> GET SCRIPT',
+                devby: "DEVELOPED BY",
+                copy: '<i class="fa-regular fa-copy"></i> COPY SCRIPT',
+                back: '<i class="fa-solid fa-arrow-left"></i> BACK',
+                copied: '<i class="fa-solid fa-check"></i> COPIED!',
+                errorMsg: "Could not copy automatically. Please select the text and copy manually."
+            },
+            VI: {
+                subtitle: "HUB SCRIPT CAO CẤP",
+                getscript: '<i class="fa-solid fa-code"></i> LẤY SCRIPT',
+                devby: "PHÁT TRIỂN BỞI",
+                copy: '<i class="fa-regular fa-copy"></i> SAO CHÉP SCRIPT',
+                back: '<i class="fa-solid fa-arrow-left"></i> QUAY LẠI',
+                copied: '<i class="fa-solid fa-check"></i> ĐÃ SAO CHÉP!',
+                errorMsg: "Không thể tự động sao chép. Vui lòng chọn văn bản và sao chép thủ công."
+            }
+        };
+
+        let currentLang = 'PT';
+
+        function setLanguage(lang, element) {
+            currentLang = lang;
+            
+            // Atualizar botões ativos
+            document.querySelectorAll('.lang-btn').forEach(btn => btn.classList.remove('active'));
+            element.classList.add('active');
+
+            // Trocar textos
+            document.getElementById('text-subtitle').innerHTML = translations[lang].subtitle;
+            document.getElementById('text-getscript').innerHTML = translations[lang].getscript;
+            document.getElementById('text-devby').innerHTML = translations[lang].devby;
+            document.getElementById('copy-btn').innerHTML = translations[lang].copy;
+            document.getElementById('text-back').innerHTML = translations[lang].back;
+        }
+
+        function toggleView(view) {
+            const mainView = document.getElementById('main-view');
+            const scriptView = document.getElementById('script-view');
+
+            if (view === 'script') {
+                mainView.classList.add('hidden');
+                scriptView.classList.remove('hidden');
+            } else {
+                scriptView.classList.add('hidden');
+                mainView.classList.remove('hidden');
+                // Resetar o texto do botão de copiar ao voltar, usando o idioma atual
+                document.getElementById('copy-btn').innerHTML = translations[currentLang].copy;
+                document.getElementById('copy-btn').style.borderColor = "#2a1515";
+                document.getElementById('copy-btn').style.color = "#ddd";
+            }
+        }
+
+        // Função de Copiar com "Plano B" caso a API moderna falhe
+        function copyScript() {
+            const scriptText = document.getElementById('script-text').innerText;
+            
+            // Função para mostrar sucesso
+            const showSuccess = () => {
+                const copyBtn = document.getElementById('copy-btn');
+                copyBtn.innerHTML = translations[currentLang].copied;
+                copyBtn.style.borderColor = "#00ff88";
+                copyBtn.style.color = "#00ff88";
+                
+                setTimeout(function() {
+                    copyBtn.innerHTML = translations[currentLang].copy;
+                    copyBtn.style.borderColor = "#2a1515";
+                    copyBtn.style.color = "#ddd";
+                }, 2000);
+            };
+
+            // Tenta usar a API moderna primeiro
+            if (navigator.clipboard && window.isSecureContext) {
+                navigator.clipboard.writeText(scriptText)
+                    .then(showSuccess)
+                    .catch(() => fallbackCopy(scriptText, showSuccess));
+            } else {
+                // Se não suportar a API moderna (ex: não está em HTTPS), usa o fallback
+                fallbackCopy(scriptText, showSuccess);
+            }
+        }
+
+        // Método alternativo de cópia super confiável
+        function fallbackCopy(text, successCallback) {
+            const textArea = document.createElement("textarea");
+            textArea.value = text;
+            // Previne rolar a tela
+            textArea.style.position = "fixed";
+            textArea.style.top = "0";
+            textArea.style.left = "0";
+            textArea.style.opacity = "0";
+            document.body.appendChild(textArea);
+            textArea.focus();
+            textArea.select();
+
+            try {
+                const successful = document.execCommand('copy');
+                if (successful) {
+                    successCallback();
+                } else {
+                    alert(translations[currentLang].errorMsg);
+                }
+            } catch (err) {
+                alert(translations[currentLang].errorMsg);
+            }
+
+            document.body.removeChild(textArea);
+        }
+    </script>
+</body>
+</html>
